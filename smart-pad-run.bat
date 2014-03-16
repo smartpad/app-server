@@ -1,0 +1,1 @@
+java -jar target\app-server-0.0.1-SNAPSHOT.jar server src\main\resources\smart-pad.yaml
