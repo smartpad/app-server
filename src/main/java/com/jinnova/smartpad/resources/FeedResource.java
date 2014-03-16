@@ -30,9 +30,10 @@ public class FeedResource {
     	}
     	List<Item<Feed>> result = new LinkedList<Item<Feed>>();
     	for (int i = offset; i < size; i++) {
-    		Item<Feed> item = new Item<Feed>(i, new Feed(version, lon, lat));
+    		Item<Feed> item = new Item<Feed>(i, new Feed(String.valueOf(i), version, lon, lat));
     		result.add(item);
     	}
     	return new JsonResponse(true, result);
     }
+    
 }

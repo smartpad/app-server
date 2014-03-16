@@ -1,6 +1,7 @@
 package com.jinnova.smartpad;
 
 import com.jinnova.smartpad.health.TemplateHealthCheck;
+import com.jinnova.smartpad.resources.ActivityResource;
 import com.jinnova.smartpad.resources.FeedResource;
 import com.yammer.dropwizard.Service;
 import com.yammer.dropwizard.config.Bootstrap;
@@ -22,6 +23,7 @@ public class SmartPadAppService extends Service<SmartPadConfiguration> {
     	final String templateHello = configuration.getTemplateHello();
         final String defaultSearchNoFound = configuration.getDefaultSearchNoFound();
         environment.addResource(new FeedResource(defaultSearchNoFound));
+        environment.addResource(new ActivityResource());
         environment.addHealthCheck(new TemplateHealthCheck(templateHello));
     }
 
