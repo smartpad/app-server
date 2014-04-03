@@ -1,2 +1,6 @@
 templateHello: Hello, %s!
 defaultSearchNoFound: Cannot find any info!
+
+http:
+    port: 9090
+    adminPort: 9091
