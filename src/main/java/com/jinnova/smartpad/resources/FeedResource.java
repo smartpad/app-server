@@ -44,10 +44,12 @@ public class FeedResource {
     	IPartnerManager pm = SmartpadCommon.getPartnerManager();
     	IUser lotte = pm.login("lotte", "123abc");
     	IOperation branch = lotte.getBranch();
-    	feeds.add(new Branch(branch));
+    	for (int i = 0; i < size; i++) {
+    		feeds.add(new Branch(branch));
+    	}
     	JsonResponse response = new JsonResponse(true);
-    	response.put("ver", "a");
-    	response.put("feeds", feeds);
+    	response.put("ud_v", "a");
+    	response.put("ud_l", feeds);
     	return response;
     }
     
