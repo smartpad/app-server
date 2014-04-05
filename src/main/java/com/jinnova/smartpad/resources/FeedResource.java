@@ -45,11 +45,11 @@ public class FeedResource {
     	IUser lotte = pm.login("lotte", "123abc");
     	IOperation branch = lotte.getBranch();
     	for (int i = 0; i < size; i++) {
-    		feeds.add(new Branch(branch));
+    		feeds.add(new Branch(branch, i));
     	}
     	JsonResponse response = new JsonResponse(true);
-    	response.put("ud_v", "a");
-    	response.put("ud_l", feeds);
+    	response.put("v", "a");
+    	response.put("l", feeds);
     	return response;
     }
     
