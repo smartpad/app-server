@@ -29,8 +29,9 @@ public class FeedResource {
     }
     
     @GET
-    public JsonResponse getFeed(@QueryParam("version")String version, @QueryParam("lon")int lon,
-    		@QueryParam("lat")int lat, @QueryParam("offset")int offset, @QueryParam("size")int size) throws SQLException {
+    public JsonResponse getFeed(@QueryParam("verTarget")String verTarget, @QueryParam("verLatest")String verLatest, 
+    		@QueryParam("lon")int lon, @QueryParam("lat")int lat, 
+    		@QueryParam("offset")int offset, @QueryParam("size")int size) throws SQLException {
     	
     	if (offset < 0) {
     		return new JsonResponse(false, null, "Negative offset: " + offset);
@@ -49,7 +50,7 @@ public class FeedResource {
     	}
     	JsonResponse response = new JsonResponse(true);
     	response.put("v", "a");
-    	response.put("l", feeds);
+    	response.put("t", feeds);
     	return response;
     }
     
