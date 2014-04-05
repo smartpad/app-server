@@ -1,6 +1,5 @@
 package com.jinnova.smartpad.domain;
 
-
 public class Feed {
 	
 	private final String id;
