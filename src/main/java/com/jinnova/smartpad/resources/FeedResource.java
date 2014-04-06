@@ -14,11 +14,13 @@ import com.jinnova.smartpad.domain.Branch;
 import com.jinnova.smartpad.domain.Catalog;
 import com.jinnova.smartpad.domain.CatalogItem;
 import com.jinnova.smartpad.domain.JsonResponse;
+import com.jinnova.smartpad.domain.Promotion;
 import com.jinnova.smartpad.domain.Shop;
 import com.jinnova.smartpad.partner.ICatalog;
 import com.jinnova.smartpad.partner.ICatalogItem;
 import com.jinnova.smartpad.partner.IOperation;
 import com.jinnova.smartpad.partner.IPartnerManager;
+import com.jinnova.smartpad.partner.IPromotion;
 import com.jinnova.smartpad.partner.IUser;
 import com.jinnova.smartpad.partner.SmartpadCommon;
 
@@ -50,11 +52,13 @@ public class FeedResource {
     	i = gen(lotte, feeds, pm.getSystemRootCatalog(), i);
     	
 		feeds.add(new Branch(lotte.getBranch(), i++));
+    	i = gen(lotte, feeds, lotte.getBranch(), i);
 		i = gen(lotte, feeds, lotte.getBranch().getRootCatalog(), i);
 		
 		lotte.getStorePagingList().setPageSize(-1);
 		for (IOperation shop : lotte.getStorePagingList().loadPage(lotte, 1).getPageItems()) {
 			feeds.add(new Shop(shop, i++));
+	    	i = gen(lotte, feeds, shop, i);
 			i = gen(lotte, feeds, shop.getRootCatalog(), i);
 		}
 		
@@ -62,6 +66,14 @@ public class FeedResource {
     	response.put("v", "a");
     	response.put("t", feeds);
     	return response;
+    }
+    
+    private static int gen(IUser u, List<Object> feeds, IOperation op, int i) throws SQLException {
+    	op.getPromotionPagingList().setPageSize(-1);
+    	for (IPromotion promo : op.getPromotionPagingList().loadPage(u, 1).getPageItems()) {
+    		feeds.add(new Promotion(promo, i++));
+    	}
+    	return i;
     }
     
     private static int gen(IUser u, List<Object> feeds, ICatalog cat, int i) throws SQLException {
