@@ -13,9 +13,9 @@ public class Catalog {
 		this.ord = ord;
 	}
 	
-	/*public String getId() {
-		return branch.get
-	}*/
+	public String getId() {
+		return cat.getId();
+	}
 
 	public String getType() {
 		return "cat";

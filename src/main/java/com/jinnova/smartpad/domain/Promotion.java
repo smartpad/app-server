@@ -13,9 +13,9 @@ public class Promotion {
 		this.ord = ord;
 	}
 	
-	/*public String getId() {
-		return branch.get
-	}*/
+	public String getId() {
+		return promo.getId();
+	}
 
 	public String getType() {
 		return "pro";

@@ -13,9 +13,9 @@ public class Shop {
 		this.ord = ord;
 	}
 	
-	/*public String getId() {
-		return branch.get
-	}*/
+	public String getId() {
+		return shop.getId();
+	}
 
 	public String getType() {
 		return "store";

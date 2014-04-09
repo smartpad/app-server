@@ -14,6 +14,7 @@ import com.jinnova.smartpad.domain.Branch;
 import com.jinnova.smartpad.domain.Catalog;
 import com.jinnova.smartpad.domain.CatalogItem;
 import com.jinnova.smartpad.domain.JsonResponse;
+import com.jinnova.smartpad.domain.Post;
 import com.jinnova.smartpad.domain.Promotion;
 import com.jinnova.smartpad.domain.Shop;
 import com.jinnova.smartpad.partner.ICatalog;
@@ -43,12 +44,14 @@ public class FeedResource {
     	if (offset < 0) {
     		return new JsonResponse(false, null, "Negative offset: " + offset);
     	}
-    	
+
+    	int i = 0;
     	List<Object> feeds = new LinkedList<Object>();
+    	feeds.add(new Post(i++));
+    	
     	IPartnerManager pm = SmartpadCommon.getPartnerManager();
     	IUser lotte = pm.login("lotte", "123abc");
     	
-    	int i = 0;
     	i = gen(lotte, feeds, pm.getSystemRootCatalog(), i);
     	
 		feeds.add(new Branch(lotte.getBranch(), i++));
@@ -68,7 +71,7 @@ public class FeedResource {
     	return response;
     }
     
-    private static int gen(IUser u, List<Object> feeds, IOperation op, int i) throws SQLException {
+    static int gen(IUser u, List<Object> feeds, IOperation op, int i) throws SQLException {
     	op.getPromotionPagingList().setPageSize(-1);
     	for (IPromotion promo : op.getPromotionPagingList().loadPage(u, 1).getPageItems()) {
     		feeds.add(new Promotion(promo, i++));
@@ -76,7 +79,7 @@ public class FeedResource {
     	return i;
     }
     
-    private static int gen(IUser u, List<Object> feeds, ICatalog cat, int i) throws SQLException {
+    static int gen(IUser u, List<Object> feeds, ICatalog cat, int i) throws SQLException {
     	
 		//feeds.add(new Catalog(cat, i++));
 		

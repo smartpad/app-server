@@ -13,9 +13,9 @@ public class Branch {
 		this.ord = ord;
 	}
 	
-	/*public String getId() {
-		return branch.get
-	}*/
+	public String getId() {
+		return branch.getId();
+	}
 
 	public String getType() {
 		return "branch";
