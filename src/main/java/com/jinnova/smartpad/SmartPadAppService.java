@@ -10,6 +10,7 @@ import com.yammer.dropwizard.config.Bootstrap;
 import com.yammer.dropwizard.config.Environment;
 
 public class SmartPadAppService extends Service<SmartPadConfiguration> {
+	
     public static void main(String[] args) throws Exception {
         new SmartPadAppService().run(args);
     }
@@ -20,8 +21,7 @@ public class SmartPadAppService extends Service<SmartPadConfiguration> {
     }
 
     @Override
-    public void run(SmartPadConfiguration configuration,
-                    Environment environment) {
+    public void run(SmartPadConfiguration configuration, Environment environment) {
     	final String templateHello = configuration.getTemplateHello();
         final String defaultSearchNoFound = configuration.getDefaultSearchNoFound();
         environment.addResource(new FeedResource(defaultSearchNoFound));
@@ -29,6 +29,11 @@ public class SmartPadAppService extends Service<SmartPadConfiguration> {
         environment.addResource(new SimilarityResource());
         environment.addHealthCheck(new TemplateHealthCheck(templateHello));
         SmartpadCommon.initialize();
+        /*try {
+			DBQuery.initialize("root", "", "jdbc:mysql://localhost/smartpad");
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		}*/
     }
 
 }

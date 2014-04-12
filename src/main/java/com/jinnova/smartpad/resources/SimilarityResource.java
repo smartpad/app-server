@@ -13,23 +13,37 @@ import javax.ws.rs.core.MediaType;
 
 import com.jinnova.smartpad.domain.JsonResponse;
 import com.jinnova.smartpad.domain.Shop;
+import com.jinnova.smartpad.partner.IDetailManager;
 import com.jinnova.smartpad.partner.IOperation;
 import com.jinnova.smartpad.partner.IPartnerManager;
 import com.jinnova.smartpad.partner.IUser;
 import com.jinnova.smartpad.partner.SmartpadCommon;
 
-@Path("/similiar")
+@Path("/similar")
 @Produces(MediaType.APPLICATION_JSON)
 public class SimilarityResource {
     
+    /**
+     * Returns in order the following:
+     * 
+     * 	- All stores belong to this branch in one compound
+     * 	- Some similar branches in one compound
+     * 	- Some active promotions in one compound
+     * 	- All sub categories of this branch's root category in one compound
+     * 	- Some posts from this branch 
+     * 	- Feature catelog items from this branch's root category
+     *
+     */
     @GET
     @Path("/branch/{targetId}")
-    public JsonResponse getBranchSimiliars(@PathParam("targetId") String targetId,
-    		@QueryParam("lon")int lon, @QueryParam("lat")int lat, 
-    		@QueryParam("offset")int offset, @QueryParam("size")int size) throws SQLException {
+    public String getBranchSimilars(@PathParam("targetId") String targetId,
+    		@QueryParam("lon")String lon, @QueryParam("lat")String lat, 
+    		@QueryParam("page")int page) throws SQLException {
     	
     	System.out.println("Similarity for branch " + targetId);
-    	if (offset < 0) {
+    	//return DBQuery.query("branch", targetId, page);
+    	return SmartpadCommon.detailManager.getDetail(IDetailManager.TYPE_BRANCH, targetId, lon, lat, page);
+    	/*if (offset < 0) {
     		return new JsonResponse(false, null, "Negative offset: " + offset);
     	}
 
@@ -42,7 +56,7 @@ public class SimilarityResource {
     	JsonResponse response = new JsonResponse(true);
     	response.put("v", "a");
     	response.put("t", feeds);
-    	return response;
+    	return response;*/
     }
     
     @GET
@@ -57,7 +71,7 @@ public class SimilarityResource {
     	}
 
     	List<Object> feeds = new LinkedList<Object>();
-    	IPartnerManager pm = SmartpadCommon.getPartnerManager();
+    	IPartnerManager pm = SmartpadCommon.partnerManager;
     	IUser lotte = pm.login("lotte", "123abc");
     	int i = 0;
     	FeedResource.gen(lotte, feeds, lotte.getBranch(), i);
@@ -80,7 +94,7 @@ public class SimilarityResource {
     	}
 
     	List<Object> feeds = new LinkedList<Object>();
-    	IPartnerManager pm = SmartpadCommon.getPartnerManager();
+    	IPartnerManager pm = SmartpadCommon.partnerManager;
     	IUser lotte = pm.login("lotte", "123abc");
     	int i = 0;
     	FeedResource.gen(lotte, feeds, lotte.getBranch().getRootCatalog(), i);
@@ -103,7 +117,7 @@ public class SimilarityResource {
     	}
 
     	List<Object> feeds = new LinkedList<Object>();
-    	IPartnerManager pm = SmartpadCommon.getPartnerManager();
+    	IPartnerManager pm = SmartpadCommon.partnerManager;
     	IUser lotte = pm.login("lotte", "123abc");
     	int i = 0;
     	for (IOperation store : lotte.getStorePagingList().loadPage(lotte, 1).getPageItems()) {
@@ -128,7 +142,7 @@ public class SimilarityResource {
     	}
 
     	List<Object> feeds = new LinkedList<Object>();
-    	IPartnerManager pm = SmartpadCommon.getPartnerManager();
+    	IPartnerManager pm = SmartpadCommon.partnerManager;
     	IUser lotte = pm.login("lotte", "123abc");
     	int i = 0;
     	FeedResource.gen(lotte, feeds, pm.getSystemRootCatalog(), i);

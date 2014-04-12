@@ -49,7 +49,7 @@ public class FeedResource {
     	List<Object> feeds = new LinkedList<Object>();
     	feeds.add(new Post(i++));
     	
-    	IPartnerManager pm = SmartpadCommon.getPartnerManager();
+    	IPartnerManager pm = SmartpadCommon.partnerManager;
     	IUser lotte = pm.login("lotte", "123abc");
     	
     	i = gen(lotte, feeds, pm.getSystemRootCatalog(), i);
