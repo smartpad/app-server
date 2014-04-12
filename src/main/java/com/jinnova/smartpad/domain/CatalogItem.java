@@ -2,6 +2,7 @@ package com.jinnova.smartpad.domain;
 
 import com.jinnova.smartpad.partner.ICatalogField;
 import com.jinnova.smartpad.partner.ICatalogItem;
+import com.jinnova.smartpad.partner.IDetailManager;
 
 public class CatalogItem {
 	
@@ -19,7 +20,7 @@ public class CatalogItem {
 	}
 
 	public String getType() {
-		return "ci";
+		return IDetailManager.TYPENAME_CATITEM;
 	}
 	
 	public int getOrd() {

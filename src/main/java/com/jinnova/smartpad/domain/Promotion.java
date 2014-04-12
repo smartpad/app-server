@@ -1,5 +1,6 @@
 package com.jinnova.smartpad.domain;
 
+import com.jinnova.smartpad.partner.IDetailManager;
 import com.jinnova.smartpad.partner.IPromotion;
 
 public class Promotion {
@@ -18,7 +19,7 @@ public class Promotion {
 	}
 
 	public String getType() {
-		return "pro";
+		return IDetailManager.TYPENAME_PROMO;
 	}
 	
 	public int getOrd() {

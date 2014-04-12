@@ -1,5 +1,7 @@
 package com.jinnova.smartpad.domain;
 
+import com.jinnova.smartpad.partner.IDetailManager;
+
 public class Post {
 	
 	private int ord;
@@ -13,7 +15,7 @@ public class Post {
 	}
 
 	public String getType() {
-		return "post";
+		return IDetailManager.TYPENAME_POST;
 	}
 	
 	public int getOrd() {

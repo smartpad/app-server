@@ -1,5 +1,6 @@
 package com.jinnova.smartpad.domain;
 
+import com.jinnova.smartpad.partner.IDetailManager;
 import com.jinnova.smartpad.partner.IOperation;
 
 public class Shop {
@@ -18,7 +19,7 @@ public class Shop {
 	}
 
 	public String getType() {
-		return "store";
+		return IDetailManager.TYPENAME_STORE;
 	}
 	
 	public int getOrd() {

@@ -1,6 +1,7 @@
 package com.jinnova.smartpad.domain;
 
 import com.jinnova.smartpad.partner.ICatalog;
+import com.jinnova.smartpad.partner.IDetailManager;
 
 public class Catalog {
 	
@@ -18,7 +19,7 @@ public class Catalog {
 	}
 
 	public String getType() {
-		return "cat";
+		return IDetailManager.TYPENAME_CAT;
 	}
 	
 	public int getOrd() {

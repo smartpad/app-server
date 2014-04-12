@@ -1,5 +1,6 @@
 package com.jinnova.smartpad.domain;
 
+import com.jinnova.smartpad.partner.IDetailManager;
 import com.jinnova.smartpad.partner.IOperation;
 
 public class Branch {
@@ -18,7 +19,7 @@ public class Branch {
 	}
 
 	public String getType() {
-		return "branch";
+		return IDetailManager.TYPENAME_BRANCH;
 	}
 	
 	public int getOrd() {

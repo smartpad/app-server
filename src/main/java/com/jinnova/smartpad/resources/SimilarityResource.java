@@ -61,12 +61,13 @@ public class SimilarityResource {
     
     @GET
     @Path("/store/{targetId}")
-    public JsonResponse getStoreSimiliars(@PathParam("targetId") String targetId,
-    		@QueryParam("lon")int lon, @QueryParam("lat")int lat, 
-    		@QueryParam("offset")int offset, @QueryParam("size")int size) throws SQLException {
+    public String getStoreSimiliars(@PathParam("targetId") String targetId,
+    		@QueryParam("lon")String lon, @QueryParam("lat")String lat, 
+    		@QueryParam("page")int page) throws SQLException {
     	
-    	System.out.println("Similarity for branch " + targetId);
-    	if (offset < 0) {
+    	System.out.println("Similarity for store " + targetId);
+    	return SmartpadCommon.detailManager.getDetail(IDetailManager.TYPE_STORE, targetId, lon, lat, page);
+    	/*if (offset < 0) {
     		return new JsonResponse(false, null, "Negative offset: " + offset);
     	}
 
@@ -79,7 +80,7 @@ public class SimilarityResource {
     	JsonResponse response = new JsonResponse(true);
     	response.put("v", "a");
     	response.put("t", feeds);
-    	return response;
+    	return response;*/
     }
     
     @GET
