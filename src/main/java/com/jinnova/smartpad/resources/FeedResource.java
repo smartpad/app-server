@@ -59,7 +59,7 @@ public class FeedResource {
 		i = gen(lotte, feeds, lotte.getBranch().getRootCatalog(), i);
 		
 		lotte.getStorePagingList().setPageSize(-1);
-		for (IOperation shop : lotte.getStorePagingList().loadPage(lotte, 1).getPageItems()) {
+		for (IOperation shop : lotte.getStorePagingList().loadPage(lotte, 1).getPageEntries()) {
 			feeds.add(new Shop(shop, i++));
 	    	i = gen(lotte, feeds, shop, i);
 			i = gen(lotte, feeds, shop.getRootCatalog(), i);
@@ -73,7 +73,7 @@ public class FeedResource {
     
     static int gen(IUser u, List<Object> feeds, IOperation op, int i) throws SQLException {
     	op.getPromotionPagingList().setPageSize(-1);
-    	for (IPromotion promo : op.getPromotionPagingList().loadPage(u, 1).getPageItems()) {
+    	for (IPromotion promo : op.getPromotionPagingList().loadPage(u, 1).getPageEntries()) {
     		feeds.add(new Promotion(promo, i++));
     	}
     	return i;
@@ -85,13 +85,13 @@ public class FeedResource {
 		
     	if (cat.getCatalogSpec() == null) {
 			cat.getCatalogItemPagingList().setPageSize(-1);
-			for (ICatalogItem ci : cat.getCatalogItemPagingList().loadPage(u, 1).getPageItems()) {
+			for (ICatalogItem ci : cat.getCatalogItemPagingList().loadPage(u, 1).getPageEntries()) {
 				feeds.add(new CatalogItem(ci, i++));
 			}
     	}
 		
 		cat.getSubCatalogPagingList().setPageSize(-1);
-		for (ICatalog sub : cat.getSubCatalogPagingList().loadPage(u, 1).getPageItems()) {
+		for (ICatalog sub : cat.getSubCatalogPagingList().loadPage(u, 1).getPageEntries()) {
 			feeds.add(new Catalog(sub, i++));
 			i = gen(u, feeds, sub, i);
 		}

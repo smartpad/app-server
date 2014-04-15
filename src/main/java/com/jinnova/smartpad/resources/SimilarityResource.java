@@ -121,7 +121,7 @@ public class SimilarityResource {
     	IPartnerManager pm = SmartpadCommon.partnerManager;
     	IUser lotte = pm.login("lotte", "123abc");
     	int i = 0;
-    	for (IOperation store : lotte.getStorePagingList().loadPage(lotte, 1).getPageItems()) {
+    	for (IOperation store : lotte.getStorePagingList().loadPage(lotte, 1).getPageEntries()) {
     		feeds.add(new Shop(store, i++));
     	}
     	
