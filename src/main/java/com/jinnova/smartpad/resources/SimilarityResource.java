@@ -19,7 +19,7 @@ import com.jinnova.smartpad.partner.IPartnerManager;
 import com.jinnova.smartpad.partner.IUser;
 import com.jinnova.smartpad.partner.SmartpadCommon;
 
-@Path("/similar")
+@Path("/")
 @Produces(MediaType.APPLICATION_JSON)
 public class SimilarityResource {
     
@@ -35,14 +35,14 @@ public class SimilarityResource {
      *
      */
     @GET
-    @Path("/branch/{targetId}")
+    @Path("branch/{targetId}/drill")
     public String getBranchSimilars(@PathParam("targetId") String targetId,
     		@QueryParam("lon")String lon, @QueryParam("lat")String lat, 
-    		@QueryParam("page")int page) throws SQLException {
+    		@QueryParam("page")List<Integer> page, @QueryParam("size") int size) throws SQLException {
     	
     	System.out.println("Similarity for branch " + targetId);
     	//return DBQuery.query("branch", targetId, page);
-    	return SmartpadCommon.detailManager.getDetail(IDetailManager.TYPE_BRANCH, targetId, lon, lat, page);
+    	return SmartpadCommon.detailManager.getDetail(IDetailManager.TYPE_BRANCH, targetId, lon, lat, page.get(0), size);
     	/*if (offset < 0) {
     		return new JsonResponse(false, null, "Negative offset: " + offset);
     	}
@@ -60,13 +60,13 @@ public class SimilarityResource {
     }
     
     @GET
-    @Path("/store/{targetId}")
+    @Path("store/{targetId}/drill")
     public String getStoreSimiliars(@PathParam("targetId") String targetId,
     		@QueryParam("lon")String lon, @QueryParam("lat")String lat, 
-    		@QueryParam("page")int page) throws SQLException {
+    		@QueryParam("page")int page, @QueryParam("size") int size) throws SQLException {
     	
     	System.out.println("Similarity for store " + targetId);
-    	return SmartpadCommon.detailManager.getDetail(IDetailManager.TYPE_STORE, targetId, lon, lat, page);
+    	return SmartpadCommon.detailManager.getDetail(IDetailManager.TYPE_STORE, targetId, lon, lat, page, size);
     	/*if (offset < 0) {
     		return new JsonResponse(false, null, "Negative offset: " + offset);
     	}
@@ -84,7 +84,7 @@ public class SimilarityResource {
     }
     
     @GET
-    @Path("/cat/{targetId}")
+    @Path("cat/{targetId}/drill")
     public JsonResponse getCatalogSimiliars(@PathParam("targetId") String targetId,
     		@QueryParam("lon")int lon, @QueryParam("lat")int lat, 
     		@QueryParam("offset")int offset, @QueryParam("size")int size) throws SQLException {
@@ -107,7 +107,7 @@ public class SimilarityResource {
     }
     
     @GET
-    @Path("/citem/{targetId}")
+    @Path("citem/{targetId}/drill")
     public JsonResponse getCatalogItemSimiliars(@PathParam("targetId") String targetId,
     		@QueryParam("lon")int lon, @QueryParam("lat")int lat, 
     		@QueryParam("offset")int offset, @QueryParam("size")int size) throws SQLException {
@@ -132,7 +132,7 @@ public class SimilarityResource {
     }
     
     @GET
-    @Path("/pro/{targetId}")
+    @Path("pro/{targetId}/drill")
     public JsonResponse getFeed(@PathParam("targetId") String targetId,
     		@QueryParam("lon")int lon, @QueryParam("lat")int lat, 
     		@QueryParam("offset")int offset, @QueryParam("size")int size) throws SQLException {
