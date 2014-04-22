@@ -37,12 +37,12 @@ public class SimilarityResource {
     @GET
     @Path("branch/{targetId}/drill")
     public String getBranchSimilars(@PathParam("targetId") String targetId,
-    		@QueryParam("lon")String lon, @QueryParam("lat")String lat, 
-    		@QueryParam("page")List<Integer> page, @QueryParam("size") int size) throws SQLException {
+    		@QueryParam("lon")String lon, @QueryParam("lat")String lat/*, 
+    		@QueryParam("page")List<Integer> page, @QueryParam("size") int size*/) throws SQLException {
     	
     	System.out.println("Similarity for branch " + targetId);
     	//return DBQuery.query("branch", targetId, page);
-    	return SmartpadCommon.detailManager.getDetail(IDetailManager.TYPE_BRANCH, targetId, lon, lat, page.get(0), size);
+    	return SmartpadCommon.detailManager.drill(IDetailManager.TYPE_BRANCH, targetId, lon, lat/*, page.get(0), size*/);
     	/*if (offset < 0) {
     		return new JsonResponse(false, null, "Negative offset: " + offset);
     	}
@@ -62,11 +62,11 @@ public class SimilarityResource {
     @GET
     @Path("store/{targetId}/drill")
     public String getStoreSimiliars(@PathParam("targetId") String targetId,
-    		@QueryParam("lon")String lon, @QueryParam("lat")String lat, 
-    		@QueryParam("page")int page, @QueryParam("size") int size) throws SQLException {
+    		@QueryParam("lon")String lon, @QueryParam("lat")String lat/*, 
+    		@QueryParam("page")int page, @QueryParam("size") int size*/) throws SQLException {
     	
     	System.out.println("Similarity for store " + targetId);
-    	return SmartpadCommon.detailManager.getDetail(IDetailManager.TYPE_STORE, targetId, lon, lat, page, size);
+    	return SmartpadCommon.detailManager.drill(IDetailManager.TYPE_STORE, targetId, lon, lat/*, page, size*/);
     	/*if (offset < 0) {
     		return new JsonResponse(false, null, "Negative offset: " + offset);
     	}
