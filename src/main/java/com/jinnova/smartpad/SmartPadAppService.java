@@ -4,7 +4,6 @@ import com.jinnova.smartpad.health.TemplateHealthCheck;
 import com.jinnova.smartpad.partner.SmartpadCommon;
 import com.jinnova.smartpad.resources.ActivityResource;
 import com.jinnova.smartpad.resources.FeedResource;
-import com.jinnova.smartpad.resources.SimilarityResource;
 import com.yammer.dropwizard.Service;
 import com.yammer.dropwizard.config.Bootstrap;
 import com.yammer.dropwizard.config.Environment;
@@ -26,7 +25,6 @@ public class SmartPadAppService extends Service<SmartPadConfiguration> {
         final String defaultSearchNoFound = configuration.getDefaultSearchNoFound();
         environment.addResource(new FeedResource(defaultSearchNoFound));
         environment.addResource(new ActivityResource());
-        environment.addResource(new SimilarityResource());
         environment.addHealthCheck(new TemplateHealthCheck(templateHello));
         SmartpadCommon.initialize();
         /*try {
