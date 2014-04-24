@@ -11,13 +11,11 @@ public class UserActivity implements Serializable {
 		LIKE(new SPAction() {
 
 			public void action(Object... params) {
-				// TODO Auto-generated method stub
 			}
 		}),
 		HIDE(new SPAction() {
 
 			public void action(Object... params) {
-				// TODO Auto-generated method stub
 			}
 		});
 		
