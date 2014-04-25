@@ -25,12 +25,12 @@ public class FeedResource {
     
     @Path("feeds")
     @GET
-    public String getFeed(@QueryParam("verTarget")String verTarget, @QueryParam("verLatest")String verLatest, 
+    public String getFeed(@QueryParam("clu")String clusterId, @QueryParam("verTarget")String verTarget, @QueryParam("verLatest")String verLatest, 
     		@QueryParam("lon")String lon, @QueryParam("lat")String lat, 
     		@QueryParam("offset")int offset, @QueryParam("size")int size) throws SQLException {
 
 		//return SmartpadCommon.detailManager.drill(null, null, lon, lat);
-		return SmartpadCommon.detailManager.drill(IDetailManager.TYPENAME_SYSCAT, IDetailManager.SYSTEM_BRANCH_ID, lon, lat);
+		return SmartpadCommon.detailManager.drill(clusterId, IDetailManager.TYPENAME_SYSCAT, IDetailManager.SYSTEM_BRANCH_ID, lon, lat);
     }
     
     /**
@@ -46,16 +46,18 @@ public class FeedResource {
      */
 	@GET
 	@Path("{targetType}/{targetId}/drill")
-	public String drill(@PathParam("targetType") String targetType, @PathParam("targetId") String targetId,
+	public String drill(@QueryParam("clu")String clusterId, @PathParam("targetType") String targetType, @PathParam("targetId") String targetId,
 			@QueryParam("lon") String lon, @QueryParam("lat") String lat) throws SQLException {
 
 		//System.out.println("Similarity for branch " + targetId);
-		return SmartpadCommon.detailManager.drill(targetType, targetId, lon, lat);
+		return SmartpadCommon.detailManager.drill(clusterId, targetType, targetId, lon, lat);
 	}
 	
     @GET
     @Path("{targetType}/{relation}/{anchorType}/{anchorId}")
-    public String more(@PathParam("targetType") String targetType,
+    public String more(
+    		@QueryParam("clu")String clusterId, 
+    		@PathParam("targetType") String targetType,
     		@PathParam("relation") String relation,
     		@PathParam("anchorType") String anchorType,
     		@PathParam("anchorId") String anchorId,
@@ -69,7 +71,7 @@ public class FeedResource {
     		@QueryParam("lon")String lon, @QueryParam("lat")String lat, 
     		@QueryParam("offset")int offset, @QueryParam("size")int size) throws SQLException {
 
-    	return SmartpadCommon.detailManager.more(targetType, anchorType, anchorId, relation, 
+    	return SmartpadCommon.detailManager.more(clusterId, targetType, anchorType, anchorId, relation, 
     			branchId, storeId, catId, syscatId, excludeId, lon, lat, offset, size);
     }
     
