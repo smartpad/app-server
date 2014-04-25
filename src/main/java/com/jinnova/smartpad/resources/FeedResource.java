@@ -9,6 +9,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
+import com.jinnova.smartpad.partner.IDetailManager;
 import com.jinnova.smartpad.partner.SmartpadCommon;
 
 @Path("/")
@@ -28,7 +29,8 @@ public class FeedResource {
     		@QueryParam("lon")String lon, @QueryParam("lat")String lat, 
     		@QueryParam("offset")int offset, @QueryParam("size")int size) throws SQLException {
 
-		return SmartpadCommon.detailManager.drill(null, null, lon, lat);
+		//return SmartpadCommon.detailManager.drill(null, null, lon, lat);
+		return SmartpadCommon.detailManager.drill(IDetailManager.TYPENAME_SYSCAT, IDetailManager.SYSTEM_BRANCH_ID, lon, lat);
     }
     
     /**
