@@ -26,7 +26,7 @@ public class SmartPadAppService extends Service<SmartPadConfiguration> {
         environment.addResource(new FeedResource(defaultSearchNoFound));
         environment.addResource(new ActivityResource());
         environment.addHealthCheck(new TemplateHealthCheck(templateHello));
-        SmartpadCommon.initialize();
+        SmartpadCommon.initialize("localhost", null, "smartpad_drill", "root", "");
         /*try {
 			DBQuery.initialize("root", "", "jdbc:mysql://localhost/smartpad");
 		} catch (SQLException e) {
