@@ -9,8 +9,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
+import com.jinnova.smartpad.drilling.DetailManager;
 import com.jinnova.smartpad.partner.IDetailManager;
-import com.jinnova.smartpad.partner.SmartpadCommon;
 
 @Path("/")
 @Produces(MediaType.APPLICATION_JSON)
@@ -30,7 +30,7 @@ public class FeedResource {
     		@QueryParam("offset")int offset, @QueryParam("size")int size) throws SQLException {
 
 		//return SmartpadCommon.detailManager.drill(null, null, lon, lat);
-		return SmartpadCommon.detailManager.drill(clusterId, IDetailManager.TYPENAME_SYSCAT, IDetailManager.SYSTEM_BRANCH_ID, lon, lat);
+		return new DetailManager().drill(clusterId, IDetailManager.TYPENAME_SYSCAT, IDetailManager.SYSTEM_BRANCH_ID, lon, lat);
     }
     
     /**
@@ -50,7 +50,7 @@ public class FeedResource {
 			@QueryParam("lon") String lon, @QueryParam("lat") String lat) throws SQLException {
 
 		//System.out.println("Similarity for branch " + targetId);
-		return SmartpadCommon.detailManager.drill(clusterId, targetType, targetId, lon, lat);
+		return new DetailManager().drill(clusterId, targetType, targetId, lon, lat);
 	}
 	
     @GET
@@ -71,7 +71,7 @@ public class FeedResource {
     		@QueryParam("lon")String lon, @QueryParam("lat")String lat, 
     		@QueryParam("offset")int offset, @QueryParam("size")int size) throws SQLException {
 
-    	return SmartpadCommon.detailManager.more(clusterId, targetType, anchorType, anchorId, relation, 
+    	return new DetailManager().more(clusterId, targetType, anchorType, anchorId, relation, 
     			branchId, storeId, catId, syscatId, excludeId, lon, lat, offset, size);
     }
     
