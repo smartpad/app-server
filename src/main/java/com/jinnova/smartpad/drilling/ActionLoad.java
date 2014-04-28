@@ -38,7 +38,7 @@ abstract class ActionLoad {
 	
 	String syscatId;
 	
-	String clusterId;
+	int clusterId;
 	
 	private final String anchorType;
 
@@ -137,9 +137,9 @@ abstract class ActionLoad {
 		}
 		StringBuffer buffer = new StringBuffer(targetType + "/" + relation + "/" + anchorType + 
 				"/" + anchorId + "?offset=" + offset + "&size="  + pageSize);
-		if (clusterId != null) {
+		//if (clusterId != null) {
 			buffer.append("&clu=" + clusterId);
-		}
+		//}
 		if (branchId != null) {
 			buffer.append("&branchId=" + branchId);
 		}

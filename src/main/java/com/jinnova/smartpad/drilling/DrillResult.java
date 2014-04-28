@@ -14,11 +14,11 @@ class DrillResult {
 	
 	private ArrayList<DrillSection> allSections = new ArrayList<>(10);
 	
-	private final String clusterId;
+	private final int clusterId;
 	private final BigDecimal lon;
 	private final BigDecimal lat;
 		
-	public DrillResult(String clusterId, BigDecimal lon, BigDecimal lat) {
+	public DrillResult(int clusterId, BigDecimal lon, BigDecimal lat) {
 		this.clusterId = clusterId;
 		this.lon = lon;
 		this.lat = lat;

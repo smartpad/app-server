@@ -1,5 +1,7 @@
 package com.jinnova.smartpad;
 
+import java.sql.SQLException;
+
 import com.jinnova.smartpad.drilling.DetailManager;
 import com.jinnova.smartpad.health.TemplateHealthCheck;
 import com.jinnova.smartpad.partner.SmartpadCommon;
@@ -28,7 +30,11 @@ public class SmartPadAppService extends Service<SmartPadConfiguration> {
         environment.addResource(new ActivityResource());
         environment.addHealthCheck(new TemplateHealthCheck(templateHello));
         SmartpadCommon.initialize("localhost", null, "smartpad_drill", "root", "");
-        DetailManager.initialize();
+        try {
+			DetailManager.initialize();
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		}
         /*try {
 			DBQuery.initialize("root", "", "jdbc:mysql://localhost/smartpad");
 		} catch (SQLException e) {

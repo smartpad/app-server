@@ -1,7 +1,11 @@
 package com.jinnova.smartpad.drilling;
 
 import java.math.BigDecimal;
+import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.HashMap;
 import java.util.LinkedList;
 
 import com.google.gson.JsonArray;
@@ -17,13 +21,16 @@ import com.jinnova.smartpad.partner.ICatalog;
 import com.jinnova.smartpad.partner.IDetailManager;
 import com.jinnova.smartpad.partner.Operation;
 import com.jinnova.smartpad.partner.PartnerManager;
+import com.jinnova.smartpad.partner.SmartpadConnectionPool;
 
 public class DetailManager implements IDetailManager {
 	
 	private static DetailDriller[] drillers = new DetailDriller[TYPE_COUNT];
+	
+	private static HashMap<String, Integer> clusterMap = new HashMap<>();
     
 	@Override
-    public String drill(String clusterId, String targetType, String targetId, String gpsLon, String gpsLat/*, int page, int size*/) throws SQLException {
+    public String drill(String uid, String targetType, String targetId, String gpsLon, String gpsLat/*, int page, int size*/) throws SQLException {
     	
 		int targetTypeNumber = typeNameToNumber(targetType);
 		String gpsZone = findGpsZone(gpsLon, gpsLat);
@@ -44,6 +51,10 @@ public class DetailManager implements IDetailManager {
     	} else {
     		lat = null;
     	}
+    	Integer clusterId = clusterMap.get(uid);
+    	if (clusterId == null) {
+    		clusterId = 1;
+    	}
     	DrillResult dr = drillers[targetTypeNumber].drill(clusterId, targetId, lon, lat/*, page, size*/);
     	JsonObject json = new JsonObject();
     	dr.writeJson(json);
@@ -60,7 +71,7 @@ public class DetailManager implements IDetailManager {
 	}
 
 	@Override
-	public String more(String clusterId, String targetType, String anchorType, String anchorId, String relation,
+	public String more(int clusterId, String targetType, String anchorType, String anchorId, String relation,
 			String branchId, String storeId, String catId, String syscatId, String excludeId,
 			String gpsLon, String gpsLat, int offset, int size) throws SQLException {
 		
@@ -90,7 +101,7 @@ public class DetailManager implements IDetailManager {
 		return json.toString();
 	}
 	
-	private static DrillResult createDefaultDrills(String clusterId, BigDecimal lon, BigDecimal lat) {
+	private static DrillResult createDefaultDrills(int clusterId, BigDecimal lon, BigDecimal lat) {
 		
 		//order statuses
 		DrillResult dr = new DrillResult(clusterId, lon, lat);
@@ -110,25 +121,15 @@ public class DetailManager implements IDetailManager {
 		//promotion alerts for a specific syscat
 	}
 	
-	public static void initialize() {
+	public static void initialize() throws SQLException {
+		
 		ActionLoad.initialize();
-		/*drillers[TYPE_NO] = new DetailDriller() {
-			
-			@Override
-			public DrillResult drill(String branchId, String gpsZone, int page, int size) throws SQLException {
-				
-				DrillResult dr = new DrillResult();
-				ICatalog rootSyscat = PartnerManager.instance.getSystemRootCatalog();
-				for (ICatalog cat : PartnerManager.instance.getSystemSubCatalog(rootSyscat.getId())) {
-					dr.add(new ALItemBelongRecursivelyToSyscat(cat.getId(), 10, 10, 10));
-				}
-				return dr;
-			}
-		};*/
+		loadAllConsumers();
+		
 		drillers[TYPE_SYSCAT] = new DetailDriller() {
 			
 			@Override
-			public DrillResult drill(String clusterId, String syscatId, BigDecimal lon, BigDecimal lat) throws SQLException {
+			public DrillResult drill(int clusterId, String syscatId, BigDecimal lon, BigDecimal lat) throws SQLException {
 				
 				DrillResult dr = createDefaultDrills(clusterId, lon, lat);
 				createSyscatAlerts(dr, syscatId);
@@ -145,7 +146,7 @@ public class DetailManager implements IDetailManager {
 		drillers[TYPE_BRANCH] = new DetailDriller() {
 			
 			@Override
-			public DrillResult drill(String clusterId, String branchId, BigDecimal lon, BigDecimal lat/*, int page, int size*/) throws SQLException {
+			public DrillResult drill(int clusterId, String branchId, BigDecimal lon, BigDecimal lat/*, int page, int size*/) throws SQLException {
 				
 				OperationDao odao = new OperationDao();
 				String syscatId = odao.loadBranch(branchId).getSyscatId();
@@ -171,7 +172,7 @@ public class DetailManager implements IDetailManager {
 		drillers[TYPE_STORE] = new DetailDriller() {
 
 			@Override
-			public DrillResult drill(String clusterId, String targetId, BigDecimal lon, BigDecimal lat/*, int page, int size*/) throws SQLException {
+			public DrillResult drill(int clusterId, String targetId, BigDecimal lon, BigDecimal lat/*, int page, int size*/) throws SQLException {
 				
 				Operation targetStore = new OperationDao().loadStore(targetId);
 				DrillResult dr = createDefaultDrills(clusterId, lon, lat);
@@ -191,7 +192,7 @@ public class DetailManager implements IDetailManager {
 		drillers[TYPE_CAT] = new DetailDriller() {
 
 			@Override
-			public DrillResult drill(String clusterId, String targetId, BigDecimal lon, BigDecimal lat/*, int page, int size*/) throws SQLException {
+			public DrillResult drill(int clusterId, String targetId, BigDecimal lon, BigDecimal lat/*, int page, int size*/) throws SQLException {
 				
 				//5 sub cats, 3 sibling cats 
 				/*String syscatId;
@@ -231,7 +232,7 @@ public class DetailManager implements IDetailManager {
 		drillers[TYPE_CATITEM] = new DetailDriller() {
 			
 			@Override
-			public DrillResult drill(String clusterId, String targetId, BigDecimal lon, BigDecimal lat/*, int page, int size*/) throws SQLException {
+			public DrillResult drill(int clusterId, String targetId, BigDecimal lon, BigDecimal lat/*, int page, int size*/) throws SQLException {
 				//5 sibling cats, 3 similar branches 
 				CatalogItem catItem = new CatalogItemDao().loadCatalogItem(targetId, null);
 				Catalog cat = new CatalogDao().loadCatalog(catItem.getCatalogId(), false);
@@ -265,7 +266,7 @@ public class DetailManager implements IDetailManager {
 		drillers[TYPE_PROMO] = new DetailDriller() {
 			
 			@Override
-			public DrillResult drill(String clusterId, String targetId, BigDecimal lon, BigDecimal lat/*, int page, int size*/) throws SQLException {
+			public DrillResult drill(int clusterId, String targetId, BigDecimal lon, BigDecimal lat/*, int page, int size*/) throws SQLException {
 
 				
 				//At most 5 stores belong to this branch and 3 similar branches
@@ -313,6 +314,32 @@ public class DetailManager implements IDetailManager {
 			return TYPE_SYSCAT;
 		} else {
 			throw new RuntimeException(name);
+		}
+	}
+	
+	private static void loadAllConsumers() throws SQLException {
+		Connection conn = null;
+		Statement stmt = null;
+		ResultSet rs = null;
+		try {
+			conn = SmartpadConnectionPool.instance.dataSource.getConnection();
+			stmt = conn.createStatement();
+			String sql = "select consumer_id, cluster_id from consumers";
+			System.out.println("SQL: " + sql);
+			rs = stmt.executeQuery(sql);
+			while (rs.next()) {
+				clusterMap.put(rs.getString("consumer_id"), rs.getInt("cluster_id"));
+			}
+		} finally {
+			if (rs != null) {
+				rs.close();
+			}
+			if (stmt != null) {
+				stmt.close();
+			}
+			if (conn != null) {
+				conn.close();
+			}
 		}
 	}
 }

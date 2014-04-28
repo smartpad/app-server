@@ -25,12 +25,12 @@ public class FeedResource {
     
     @Path("feeds")
     @GET
-    public String getFeed(@QueryParam("clu")String clusterId, @QueryParam("verTarget")String verTarget, @QueryParam("verLatest")String verLatest, 
+    public String getFeed(@QueryParam("u")String uid, @QueryParam("verTarget")String verTarget, @QueryParam("verLatest")String verLatest, 
     		@QueryParam("lon")String lon, @QueryParam("lat")String lat, 
     		@QueryParam("offset")int offset, @QueryParam("size")int size) throws SQLException {
 
 		//return SmartpadCommon.detailManager.drill(null, null, lon, lat);
-		return new DetailManager().drill(clusterId, IDetailManager.TYPENAME_SYSCAT, IDetailManager.SYSTEM_BRANCH_ID, lon, lat);
+		return new DetailManager().drill(uid, IDetailManager.TYPENAME_SYSCAT, IDetailManager.SYSTEM_BRANCH_ID, lon, lat);
     }
     
     /**
@@ -46,17 +46,17 @@ public class FeedResource {
      */
 	@GET
 	@Path("{targetType}/{targetId}/drill")
-	public String drill(@QueryParam("clu")String clusterId, @PathParam("targetType") String targetType, @PathParam("targetId") String targetId,
+	public String drill(@QueryParam("u")String uid, @PathParam("targetType") String targetType, @PathParam("targetId") String targetId,
 			@QueryParam("lon") String lon, @QueryParam("lat") String lat) throws SQLException {
 
 		//System.out.println("Similarity for branch " + targetId);
-		return new DetailManager().drill(clusterId, targetType, targetId, lon, lat);
+		return new DetailManager().drill(uid, targetType, targetId, lon, lat);
 	}
 	
     @GET
     @Path("{targetType}/{relation}/{anchorType}/{anchorId}")
     public String more(
-    		@QueryParam("clu")String clusterId, 
+    		@QueryParam("clu")int clusterId, 
     		@PathParam("targetType") String targetType,
     		@PathParam("relation") String relation,
     		@PathParam("anchorType") String anchorType,
