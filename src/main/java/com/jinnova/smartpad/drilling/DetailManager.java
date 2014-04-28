@@ -6,7 +6,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
-import java.util.LinkedList;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -17,10 +16,8 @@ import com.jinnova.smartpad.db.CatalogItemDao;
 import com.jinnova.smartpad.db.OperationDao;
 import com.jinnova.smartpad.partner.Catalog;
 import com.jinnova.smartpad.partner.CatalogItem;
-import com.jinnova.smartpad.partner.ICatalog;
 import com.jinnova.smartpad.partner.IDetailManager;
 import com.jinnova.smartpad.partner.Operation;
-import com.jinnova.smartpad.partner.PartnerManager;
 import com.jinnova.smartpad.partner.SmartpadConnectionPool;
 
 public class DetailManager implements IDetailManager {
@@ -133,13 +130,7 @@ public class DetailManager implements IDetailManager {
 				
 				DrillResult dr = createDefaultDrills(clusterId, lon, lat);
 				createSyscatAlerts(dr, syscatId);
-				LinkedList<Catalog> subSyscats = PartnerManager.instance.getSystemSubCatalog(syscatId);
-				if (subSyscats == null) {
-					return dr; //TODO show what?
-				}
-				for (ICatalog cat : subSyscats) {
-					dr.add(new ALItemBelongRecursivelyToSyscat(cat.getId(), 10, 10, 10));
-				}
+				dr.add(new ALItemBelongRecursivelyToSyscat(syscatId, 10, 10, 10));
 				return dr;
 			}
 		};
