@@ -64,6 +64,7 @@ class RenderLinkJob {
 				buffer.append(html);
 			} else if (entry.getValue().isJsonArray()) {
 				JsonArray ja = entry.getValue().getAsJsonArray();
+				buffer.append(entry.getKey() + ": (" + ja.size() + ")");
 				for (int i = 0; i < ja.size(); i++) {
 					buffer.append("<blockquote>");
 					render(buffer, ja.get(i).getAsJsonObject());

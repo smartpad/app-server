@@ -14,6 +14,8 @@ class DrillResult {
 	
 	private ArrayList<DrillSection> allSections = new ArrayList<>(10);
 	
+	private LinkedList<Feed> feeds = new LinkedList<Feed>();
+	
 	private final int clusterId;
 	private final BigDecimal lon;
 	private final BigDecimal lat;
@@ -115,6 +117,10 @@ class DrillResult {
 				new DrillSectionSimple(load1), new DrillSectionSimple(load2)));
 	}
 	
+	void add(Feed f) {
+		feeds.add(f);
+	}
+	
 	public void writeJson(JsonObject resultJson) {
 		
 		boolean flatten = false;
@@ -140,6 +146,10 @@ class DrillResult {
 					jsonList.add(oneJson);
 				}
 			}
+		}
+		
+		for (Feed f : feeds) {
+			jsonList.add(f.generateFeedJson());
 		}
 		
 		JsonArray ja = new JsonArray();

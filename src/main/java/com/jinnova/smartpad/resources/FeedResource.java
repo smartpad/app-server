@@ -80,11 +80,11 @@ public class FeedResource {
     		@QueryParam("syscatId") String syscatId,
     		@QueryParam("excludeId") String excludeId,
     		
-    		@QueryParam("lon")String lon, @QueryParam("lat")String lat, 
+    		@QueryParam("recur")boolean recursize, @QueryParam("lon")String lon, @QueryParam("lat")String lat, 
     		@QueryParam("offset")int offset, @QueryParam("size")int size) throws SQLException {
 
     	return new DetailManager().more(clusterId, targetType, anchorType, anchorId, relation, 
-    			branchId, storeId, catId, syscatId, excludeId, lon, lat, offset, size);
+    			branchId, storeId, catId, syscatId, excludeId, recursize, lon, lat, offset, size);
     }
     
     /*@Path("feeds")

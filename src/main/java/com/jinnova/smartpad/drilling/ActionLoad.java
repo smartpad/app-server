@@ -11,8 +11,6 @@ import com.jinnova.smartpad.db.CatalogItemDao;
 import com.jinnova.smartpad.db.OperationDao;
 import com.jinnova.smartpad.partner.Catalog;
 import com.jinnova.smartpad.partner.ICatalog;
-import com.jinnova.smartpad.partner.ICatalogItem;
-import com.jinnova.smartpad.partner.ICatalogItemSort;
 import com.jinnova.smartpad.partner.ICatalogSort;
 import com.jinnova.smartpad.partner.ICatalogSpec;
 import com.jinnova.smartpad.partner.IPromotion;
@@ -23,6 +21,8 @@ import com.jinnova.smartpad.partner.PartnerManager;
 abstract class ActionLoad {
 	
 	static final String REL_SIMILAR = "sim";
+	
+	static final String REL_BELONG = "bel";
 	
 	static final String REL_BELONG_DIRECTLY = "beld";
 	
@@ -68,12 +68,14 @@ abstract class ActionLoad {
 	
 	private static boolean initializing = true;
 	
+	boolean recursive = false;
+	
 	static void initialize() {
 		actionClasses = new HashMap<String, Class<? extends ActionLoad>>();
 		register(new ALBranchesBelongDirectlyToSyscat());
 		register(new ALBranchesBelongRecursivelyToSyscat());
 		register(new ALCatalogsBelongDirectlyToCatalog());
-		register(new ALItemBelongDirectlyToCatalog());
+		register(new ALItemBelongToCatalog());
 		register(new ALItemBelongRecursivelyToSyscat());
 		register(new ALPromotionsBelongDirectlyToSyscat());
 		register(new ALStoresBelongToBranch());
@@ -127,6 +129,16 @@ abstract class ActionLoad {
 		this.initialDrillSize = initialDrillSize;
 	}
 	
+	void setParams(String anchorId, String excludeId, boolean recursive, 
+			int pageSize, int initialLoadSize, int initialDrillSize) {
+		this.anchorId = anchorId;
+		this.excludeId = excludeId;
+		this.recursive = recursive;
+		this.pageSize = pageSize;
+		this.initialLoadSize = initialLoadSize;
+		this.initialDrillSize = initialDrillSize;
+	}
+	
 	ActionLoad exclude(String excludeId) {
 		this.excludeId = excludeId;
 		return this;
@@ -162,16 +174,17 @@ abstract class ActionLoad {
 		if (gpsLat != null) {
 			buffer.append("&lat=" + gpsLat.toPlainString());
 		}
+		buffer.append("&recur=" + recursive);
 		return buffer.toString();
 	}
 	
 	abstract Object[] load(int offset, int size) throws SQLException;
 	
 	Object[] loadFirstEntries() throws SQLException {
-		return loadFirstEntries(initialLoadSize);
+		return load(0, initialLoadSize);
 	}
 	
-	abstract Object[] loadFirstEntries(int initialLoadSize) throws SQLException;
+	//abstract Object[] loadFirstEntries(int initialLoadSize) throws SQLException;
 	
 	final Object[] load() throws SQLException {
 		Object[] result = load(offset, pageSize);
@@ -200,11 +213,6 @@ class ALBranchesBelongDirectlyToSyscat extends ActionLoad {
 		return new OperationDao().iterateBranchesBySyscatDirectly(anchorId, excludeId).toArray(); //TODO size, offset
 	}
 	
-	@Override
-	Object[] loadFirstEntries(int size) throws SQLException {
-		return new OperationDao().iterateBranchesBySyscatDirectly(anchorId, excludeId).toArray(); //TODO size
-	}
-	
 }
 
 class ALBranchesBelongRecursivelyToSyscat extends ActionLoad {
@@ -223,11 +231,6 @@ class ALBranchesBelongRecursivelyToSyscat extends ActionLoad {
 		return new OperationDao().iterateBranchesBySyscatRecursively(anchorId, excludeId).toArray(); //TODO size, offset
 	}
 	
-	@Override
-	Object[] loadFirstEntries(int size) throws SQLException {
-		return new OperationDao().iterateBranchesBySyscatRecursively(anchorId, excludeId).toArray(); //TODO size
-	}
-	
 }
 
 class ALStoresBelongToBranch extends ActionLoad {
@@ -244,11 +247,6 @@ class ALStoresBelongToBranch extends ActionLoad {
 	@Override
 	Object[] load(int offset, int size) throws SQLException {
 		return new OperationDao().iterateStores(anchorId, excludeId, offset, size).toArray();
-	}
-	
-	@Override
-	Object[] loadFirstEntries(int size) throws SQLException {
-		return new OperationDao().iterateStores(anchorId, excludeId, 0, size).toArray();
 	}
 	
 }
@@ -272,40 +270,23 @@ class ALCatalogsBelongDirectlyToCatalog extends ActionLoad {
 		return paging.loadFromOffset(offset).getPageEntries();
 	}
 	
-	@Override
-	Object[] loadFirstEntries(int size) throws SQLException {
-		String syscatId = null; //don't need to parse spec 
-		CachedPagingList<ICatalog, ICatalogSort> paging = Catalog.createSubCatalogPagingList(null, null, anchorId, syscatId, null);
-		paging.setPageSize(size);
-		return paging.loadFromOffset(0).getPageEntries();
-	}
-	
 }
 
-class ALItemBelongDirectlyToCatalog extends ActionLoad {
+class ALItemBelongToCatalog extends ActionLoad {
 	
-	ALItemBelongDirectlyToCatalog() {
-		super(TYPENAME_CAT, TYPENAME_CATITEM, REL_BELONG_DIRECTLY);
+	ALItemBelongToCatalog() {
+		super(TYPENAME_CAT, TYPENAME_CATITEM, REL_BELONG);
 	}
 
-	ALItemBelongDirectlyToCatalog(String catId, String syscatId, int pageSize, int initialLoadSize, int initialDrillSize) {
+	ALItemBelongToCatalog(String catId, String excludeItemId, 
+			boolean recursive, int pageSize, int initialLoadSize, int initialDrillSize) {
 		this();
-		setParams(catId, null, pageSize, initialLoadSize, initialDrillSize);
-		this.syscatId = syscatId;
+		setParams(catId, excludeItemId, recursive, pageSize, initialLoadSize, initialDrillSize);
 	}
 
 	@Override
 	Object[] load(int offset, int size) throws SQLException {
-		CachedPagingList<ICatalogItem, ICatalogItemSort> paging = Catalog.createCatalogItemPagingList(null, null, anchorId, syscatId, null);
-		paging.setPageSize(size);
-		return paging.loadFromOffset(offset).getPageEntries();
-	}
-	
-	@Override
-	Object[] loadFirstEntries(int size) throws SQLException {
-		CachedPagingList<ICatalogItem, ICatalogItemSort> paging = Catalog.createCatalogItemPagingList(null, null, anchorId, syscatId, null);
-		paging.setPageSize(size);
-		return paging.loadFromOffset(0).getPageEntries();
+		return new CatalogItemDao().iterateItemsByCatalog(recursive, anchorId, excludeId, gpsLon, gpsLat, offset, size).toArray();
 	}
 	
 }
@@ -327,12 +308,6 @@ class ALItemBelongRecursivelyToSyscat extends ActionLoad {
 		return new CatalogItemDao().iterateCatalogItems(clusterId, spec, anchorId, gpsLon, gpsLat, offset, size).toArray();
 	}
 	
-	@Override
-	Object[] loadFirstEntries(int size) throws SQLException {
-		ICatalogSpec spec = PartnerManager.instance.getCatalogSpec(anchorId);
-		return new CatalogItemDao().iterateCatalogItems(clusterId, spec, anchorId, gpsLon, gpsLat, 0, size).toArray();
-	}
-	
 }
 
 class ALPromotionsBelongDirectlyToSyscat extends ActionLoad {
@@ -352,14 +327,6 @@ class ALPromotionsBelongDirectlyToSyscat extends ActionLoad {
 				Operation.createPromotionPagingList(null, null, anchorId, null); //TODO gps
 		paging.setPageSize(size);
 		return paging.loadFromOffset(offset).getPageEntries();
-	}
-	
-	@Override
-	Object[] loadFirstEntries(int size) throws SQLException {
-		CachedPagingList<IPromotion, IPromotionSort> paging = 
-				Operation.createPromotionPagingList(null, null, anchorId, null); //TODO gps
-		paging.setPageSize(size);
-		return paging.loadFromOffset(0).getPageEntries();
 	}
 	
 }

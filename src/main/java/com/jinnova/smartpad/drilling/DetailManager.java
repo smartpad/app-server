@@ -23,6 +23,9 @@ import com.jinnova.smartpad.partner.SmartpadConnectionPool;
 
 public class DetailManager implements IDetailManager {
 	
+	private static final boolean RECURSIVE = true;
+	private static final boolean DIRECT = false;
+	
 	private static DetailDriller[] drillers = new DetailDriller[TYPE_COUNT];
 	
 	private static HashMap<String, Integer> clusterMap = new HashMap<>();
@@ -71,7 +74,7 @@ public class DetailManager implements IDetailManager {
 	@Override
 	public String more(int clusterId, String targetType, String anchorType, String anchorId, String relation,
 			String branchId, String storeId, String catId, String syscatId, String excludeId,
-			String gpsLon, String gpsLat, int offset, int size) throws SQLException {
+			boolean recursive, String gpsLon, String gpsLat, int offset, int size) throws SQLException {
 		
 		ActionLoad action = ActionLoad.createLoad(targetType, anchorType, relation);
 		action.clusterId = clusterId;
@@ -79,6 +82,7 @@ public class DetailManager implements IDetailManager {
 		action.excludeId = excludeId;
 		action.offset = offset;
 		action.pageSize = size;
+		action.recursive = recursive;
 		if (gpsLon != null) {
 			action.gpsLon = new BigDecimal(gpsLon);
 		}
@@ -158,7 +162,7 @@ public class DetailManager implements IDetailManager {
 				dr.add(new ALCatalogsBelongDirectlyToCatalog(branchId, null, 10, 10, 10));
 				
 				//catelog items from this branch's root category
-				dr.add(new ALItemBelongDirectlyToCatalog(branchId, syscatId, 20, 20, 20));
+				dr.add(new ALItemBelongToCatalog(branchId, null, DIRECT, 20, 20, 20));
 				return dr;
 			}
 		};
@@ -210,7 +214,7 @@ public class DetailManager implements IDetailManager {
 				dr.add(new ALPromotionsBelongDirectlyToSyscat(syscatId, cat.branchId, 10, 5, 5));
 				
 				//5 feature items from this catalog
-				dr.add(new ALItemBelongDirectlyToCatalog(targetId, syscatId, 10, 5, 5));
+				dr.add(new ALItemBelongToCatalog(targetId, null, RECURSIVE, 10, 5, 5));
 				
 				//5 other stores, 3 similar branches
 				//ja = StoreDriller.findStoresOfBranch(cat.branchId, cat.storeId, 0, 8);
@@ -235,6 +239,8 @@ public class DetailManager implements IDetailManager {
 				DrillResult dr = createDefaultDrills(clusterId, lon, lat);
 				createBranchAlerts(dr, cat.branchId);
 				
+				dr.add(catItem);
+				dr.add(new ALItemBelongToCatalog(cat.getId(), targetId, RECURSIVE, 10, 10, 10));
 				dr.add(new ALCatalogsBelongDirectlyToCatalog(cat.getParentCatalogId(), catItem.getCatalogId(), 10, 8, 5));
 				return dr;
 				/*Catalog cat = (Catalog) new CatalogDao().loadCatalog(targetId, false);
