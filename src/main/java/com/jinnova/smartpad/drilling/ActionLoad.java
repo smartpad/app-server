@@ -71,6 +71,7 @@ abstract class ActionLoad {
 	static void initialize() {
 		actionClasses = new HashMap<String, Class<? extends ActionLoad>>();
 		register(new ALBranchesBelongDirectlyToSyscat());
+		register(new ALBranchesBelongRecursivelyToSyscat());
 		register(new ALCatalogsBelongDirectlyToCatalog());
 		register(new ALItemBelongDirectlyToCatalog());
 		register(new ALItemBelongRecursivelyToSyscat());
@@ -219,12 +220,12 @@ class ALBranchesBelongRecursivelyToSyscat extends ActionLoad {
 
 	@Override
 	Object[] load(int offset, int size) throws SQLException {
-		return new OperationDao().iterateBranchesBySyscatDirectly(anchorId, excludeId).toArray(); //TODO size, offset
+		return new OperationDao().iterateBranchesBySyscatRecursively(anchorId, excludeId).toArray(); //TODO size, offset
 	}
 	
 	@Override
 	Object[] loadFirstEntries(int size) throws SQLException {
-		return new OperationDao().iterateBranchesBySyscatDirectly(anchorId, excludeId).toArray(); //TODO size
+		return new OperationDao().iterateBranchesBySyscatRecursively(anchorId, excludeId).toArray(); //TODO size
 	}
 	
 }
