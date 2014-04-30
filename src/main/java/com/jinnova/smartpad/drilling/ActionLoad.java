@@ -6,27 +6,16 @@ import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.HashMap;
 
-import com.jinnova.smartpad.CachedPagingList;
+import com.jinnova.smartpad.db.CatalogDao;
 import com.jinnova.smartpad.db.CatalogItemDao;
 import com.jinnova.smartpad.db.OperationDao;
-import com.jinnova.smartpad.partner.Catalog;
-import com.jinnova.smartpad.partner.ICatalog;
-import com.jinnova.smartpad.partner.ICatalogSort;
-import com.jinnova.smartpad.partner.ICatalogSpec;
-import com.jinnova.smartpad.partner.IPromotion;
-import com.jinnova.smartpad.partner.IPromotionSort;
-import com.jinnova.smartpad.partner.Operation;
-import com.jinnova.smartpad.partner.PartnerManager;
+import com.jinnova.smartpad.db.PromotionDao;
 
 abstract class ActionLoad {
 	
 	static final String REL_SIMILAR = "sim";
 	
 	static final String REL_BELONG = "bel";
-	
-	static final String REL_BELONG_DIRECTLY = "beld";
-	
-	static final String REL_BELONG_RECURSIVELY = "beli";
 	
 	static final String REL_SIBLING = "sib";
 	
@@ -72,12 +61,11 @@ abstract class ActionLoad {
 	
 	static void initialize() {
 		actionClasses = new HashMap<String, Class<? extends ActionLoad>>();
-		register(new ALBranchesBelongDirectlyToSyscat());
-		register(new ALBranchesBelongRecursivelyToSyscat());
-		register(new ALCatalogsBelongDirectlyToCatalog());
+		register(new ALBranchesBelongToSyscat());
+		register(new ALCatalogsBelongToCatalog());
 		register(new ALItemBelongToCatalog());
-		register(new ALItemBelongRecursivelyToSyscat());
-		register(new ALPromotionsBelongDirectlyToSyscat());
+		register(new ALItemBelongToSyscat());
+		register(new ALPromotionsBelongToSyscat());
 		register(new ALStoresBelongToBranch());
 		initializing = false;
 	}
@@ -119,14 +107,6 @@ abstract class ActionLoad {
 		this.anchorType = anchorType;
 		this.targetType = targetType;
 		this.relation = relation;
-	}
-	
-	void setParams(String anchorId, String excludeId, int pageSize, int initialLoadSize, int initialDrillSize) {
-		this.anchorId = anchorId;
-		this.excludeId = excludeId;
-		this.pageSize = pageSize;
-		this.initialLoadSize = initialLoadSize;
-		this.initialDrillSize = initialDrillSize;
 	}
 	
 	void setParams(String anchorId, String excludeId, boolean recursive, 
@@ -196,39 +176,21 @@ abstract class ActionLoad {
 	}
 }
 
-class ALBranchesBelongDirectlyToSyscat extends ActionLoad {
+class ALBranchesBelongToSyscat extends ActionLoad {
 	
-	ALBranchesBelongDirectlyToSyscat() {
-		super(TYPENAME_SYSCAT, TYPENAME_BRANCH, REL_BELONG_DIRECTLY);
+	ALBranchesBelongToSyscat() {
+		super(TYPENAME_SYSCAT, TYPENAME_BRANCH, REL_BELONG);
 	}
 
-	ALBranchesBelongDirectlyToSyscat(String anchorSyscatId, String excludeBranchId,
-			int pageSize, int initialLoadSize, int initialDrillSize) {
+	ALBranchesBelongToSyscat(String anchorSyscatId, String excludeBranchId,
+			boolean recursive, int pageSize, int initialLoadSize, int initialDrillSize) {
 		this();
-		setParams(anchorSyscatId, excludeBranchId, pageSize, initialLoadSize, initialDrillSize);
+		setParams(anchorSyscatId, excludeBranchId, recursive, pageSize, initialLoadSize, initialDrillSize);
 	}
 
 	@Override
 	Object[] load(int offset, int size) throws SQLException {
-		return new OperationDao().iterateBranchesBySyscatDirectly(anchorId, excludeId).toArray(); //TODO size, offset
-	}
-	
-}
-
-class ALBranchesBelongRecursivelyToSyscat extends ActionLoad {
-	
-	ALBranchesBelongRecursivelyToSyscat() {
-		super(TYPENAME_SYSCAT, TYPENAME_BRANCH, REL_BELONG_RECURSIVELY);
-	}
-
-	ALBranchesBelongRecursivelyToSyscat(String anchorSyscatId, String excludeBranchId, int pageSize, int initialLoadSize, int initialDrillSize) {
-		this();
-		setParams(anchorSyscatId, excludeBranchId, pageSize, initialLoadSize, initialDrillSize);
-	}
-
-	@Override
-	Object[] load(int offset, int size) throws SQLException {
-		return new OperationDao().iterateBranchesBySyscatRecursively(anchorId, excludeId).toArray(); //TODO size, offset
+		return new OperationDao().iterateBranchesBySyscat(anchorId, excludeId, recursive).toArray(); //TODO size, offset
 	}
 	
 }
@@ -236,12 +198,12 @@ class ALBranchesBelongRecursivelyToSyscat extends ActionLoad {
 class ALStoresBelongToBranch extends ActionLoad {
 	
 	ALStoresBelongToBranch() {
-		super(TYPENAME_BRANCH, TYPENAME_STORE, REL_BELONG_DIRECTLY);
+		super(TYPENAME_BRANCH, TYPENAME_STORE, REL_BELONG);
 	}
 
 	ALStoresBelongToBranch(String anchorBranchId, String excludeStoreId, int pageSize, int initialLoadSize, int initialDrillSize) {
 		this();
-		setParams(anchorBranchId, excludeStoreId, pageSize, initialLoadSize, initialDrillSize);
+		setParams(anchorBranchId, excludeStoreId, false, pageSize, initialLoadSize, initialDrillSize);
 	}
 
 	@Override
@@ -251,23 +213,21 @@ class ALStoresBelongToBranch extends ActionLoad {
 	
 }
 
-class ALCatalogsBelongDirectlyToCatalog extends ActionLoad {
+class ALCatalogsBelongToCatalog extends ActionLoad {
 	
-	ALCatalogsBelongDirectlyToCatalog() {
-		super(TYPENAME_CAT, TYPENAME_CAT, REL_BELONG_DIRECTLY);
+	ALCatalogsBelongToCatalog() {
+		super(TYPENAME_CAT, TYPENAME_CAT, REL_BELONG);
 	}
 
-	ALCatalogsBelongDirectlyToCatalog(String catId, String excludeCatId, int pageSize, int initialLoadSize, int initialDrillSize) {
+	ALCatalogsBelongToCatalog(String parentCatId, String excludeCatId, 
+			boolean recursive, int pageSize, int initialLoadSize, int initialDrillSize) {
 		this();
-		setParams(catId, excludeCatId, pageSize, initialLoadSize, initialDrillSize);
+		setParams(parentCatId, excludeCatId, recursive, pageSize, initialLoadSize, initialDrillSize);
 	}
 
 	@Override
 	Object[] load(int offset, int size) throws SQLException {
-		String syscatId = null; //don't need to parse spec 
-		CachedPagingList<ICatalog, ICatalogSort> paging = Catalog.createSubCatalogPagingList(null, null, anchorId, syscatId, null);
-		paging.setPageSize(size);
-		return paging.loadFromOffset(offset).getPageEntries();
+		return new CatalogDao().iterateCatalogs(anchorId, excludeId, recursive, offset, size).toArray();
 	}
 	
 }
@@ -286,47 +246,46 @@ class ALItemBelongToCatalog extends ActionLoad {
 
 	@Override
 	Object[] load(int offset, int size) throws SQLException {
-		return new CatalogItemDao().iterateItemsByCatalog(recursive, anchorId, excludeId, gpsLon, gpsLat, offset, size).toArray();
+		return new CatalogItemDao().iterateItemsByCatalog(anchorId, excludeId, recursive, gpsLon, gpsLat, offset, size).toArray();
 	}
 	
 }
 
-class ALItemBelongRecursivelyToSyscat extends ActionLoad {
+class ALItemBelongToSyscat extends ActionLoad {
 	
-	ALItemBelongRecursivelyToSyscat() {
-		super(TYPENAME_SYSCAT, TYPENAME_CATITEM, REL_BELONG_RECURSIVELY);
+	ALItemBelongToSyscat() {
+		super(TYPENAME_SYSCAT, TYPENAME_CATITEM, REL_BELONG);
 	}
 
-	ALItemBelongRecursivelyToSyscat(String syscatId, int pageSize, int initialLoadSize, int initialDrillSize) {
+	ALItemBelongToSyscat(String syscatId, boolean recursive, int pageSize, int initialLoadSize, int initialDrillSize) {
 		this();
-		setParams(syscatId, null, pageSize, initialLoadSize, initialDrillSize);
+		setParams(syscatId, null, recursive, pageSize, initialLoadSize, initialDrillSize);
 	}
 
 	@Override
 	Object[] load(int offset, int size) throws SQLException {
-		ICatalogSpec spec = PartnerManager.instance.getCatalogSpec(anchorId);
-		return new CatalogItemDao().iterateCatalogItems(clusterId, spec, anchorId, gpsLon, gpsLat, offset, size).toArray();
+		return new CatalogItemDao().iterateItemsBySyscat(anchorId, clusterId, recursive, gpsLon, gpsLat, offset, size).toArray();
 	}
 	
 }
 
-class ALPromotionsBelongDirectlyToSyscat extends ActionLoad {
+class ALPromotionsBelongToSyscat extends ActionLoad {
 	
-	ALPromotionsBelongDirectlyToSyscat() {
-		super(TYPENAME_BRANCH, TYPENAME_PROMO, REL_BELONG_DIRECTLY);
+	ALPromotionsBelongToSyscat() {
+		super(TYPENAME_BRANCH, TYPENAME_PROMO, REL_BELONG);
 	}
 
-	ALPromotionsBelongDirectlyToSyscat(String syscatId, String preferedBranchId, int pageSize, int initialLoadSize, int initialDrillSize) {
+	ALPromotionsBelongToSyscat(String syscatId, String excludePromoId, String preferedBranchId, //TODO prefered branch 
+			boolean recursive, int clusterId, int pageSize, int initialLoadSize, int initialDrillSize) {
 		this();
-		setParams(syscatId, null, pageSize, initialLoadSize, initialDrillSize);
+		setParams(syscatId, excludePromoId, recursive, pageSize, initialLoadSize, initialDrillSize);
+		this.clusterId = clusterId;
 	}
 
 	@Override
 	Object[] load(int offset, int size) throws SQLException {
-		CachedPagingList<IPromotion, IPromotionSort> paging = 
-				Operation.createPromotionPagingList(null, null, anchorId, null); //TODO gps
-		paging.setPageSize(size);
-		return paging.loadFromOffset(offset).getPageEntries();
+		
+		return new PromotionDao().iteratePromosBySyscat(anchorId, excludeId, recursive, clusterId).toArray();
 	}
 	
 }

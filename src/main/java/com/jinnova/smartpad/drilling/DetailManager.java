@@ -14,11 +14,13 @@ import com.jinnova.smartpad.db.CacheDao;
 import com.jinnova.smartpad.db.CatalogDao;
 import com.jinnova.smartpad.db.CatalogItemDao;
 import com.jinnova.smartpad.db.OperationDao;
+import com.jinnova.smartpad.db.PromotionDao;
 import com.jinnova.smartpad.partner.Catalog;
 import com.jinnova.smartpad.partner.CatalogItem;
 import com.jinnova.smartpad.partner.IDetailManager;
 import com.jinnova.smartpad.partner.Operation;
 import com.jinnova.smartpad.partner.PartnerManager;
+import com.jinnova.smartpad.partner.Promotion;
 import com.jinnova.smartpad.partner.SmartpadConnectionPool;
 
 public class DetailManager implements IDetailManager {
@@ -135,8 +137,8 @@ public class DetailManager implements IDetailManager {
 				
 				DrillResult dr = createDefaultDrills(clusterId, lon, lat);
 				createSyscatAlerts(dr, syscatId);
-				dr.add(new ALBranchesBelongRecursivelyToSyscat(syscatId, null, 10, 10, 10));
-				dr.add(new ALItemBelongRecursivelyToSyscat(syscatId, 10, 10, 10));
+				dr.add(new ALBranchesBelongToSyscat(syscatId, null, RECURSIVE, 10, 10, 10));
+				dr.add(new ALItemBelongToSyscat(syscatId, RECURSIVE, 10, 10, 10));
 				return dr;
 			}
 		};
@@ -153,13 +155,13 @@ public class DetailManager implements IDetailManager {
 				//At most 5 stores belong to this branch and 3 similar branches
 				dr.add(TYPENAME_COMPOUND_BRANCHSTORE, 
 						new ALStoresBelongToBranch(branchId, null, 10, 8, 5), 
-						new ALBranchesBelongDirectlyToSyscat(syscatId, branchId, 10, 8, 3));
+						new ALBranchesBelongToSyscat(syscatId, branchId, DIRECT, 10, 8, 3));
 				
 				//5 active promotions by syscat, this branch first 
-				dr.add(new ALPromotionsBelongDirectlyToSyscat(syscatId, branchId, 10, 5, 5));
+				dr.add(new ALPromotionsBelongToSyscat(syscatId, null, branchId, DIRECT, clusterId, 10, 5, 5));
 				
 				//10 sub categories of this branch's root category in one compound
-				dr.add(new ALCatalogsBelongDirectlyToCatalog(branchId, null, 10, 10, 10));
+				dr.add(new ALCatalogsBelongToCatalog(branchId, null, DIRECT, 10, 10, 10));
 				
 				//catelog items from this branch's root category
 				dr.add(new ALItemBelongToCatalog(branchId, null, DIRECT, 20, 20, 20));
@@ -178,10 +180,10 @@ public class DetailManager implements IDetailManager {
 				//5 stores belong in same branch with this store, and 3 similar branches
 				dr.add(TYPENAME_COMPOUND_BRANCHSTORE, 
 						new ALStoresBelongToBranch(targetStore.getBranchId(), targetId, 10, 8, 5), 
-						new ALBranchesBelongDirectlyToSyscat(targetStore.getSyscatId(), targetStore.getBranchId(), 10, 8, 3));
+						new ALBranchesBelongToSyscat(targetStore.getSyscatId(), targetStore.getBranchId(), DIRECT, 10, 8, 3));
 				
 				//Some active promotions from this branch in one compound
-				dr.add(new ALPromotionsBelongDirectlyToSyscat(targetStore.getSyscatId(), targetStore.getBranchId(), 10, 10, 10));
+				dr.add(new ALPromotionsBelongToSyscat(targetStore.getSyscatId(), null, targetStore.getBranchId(), DIRECT, clusterId, 10, 10, 10));
 				return dr;
 			}
 			
@@ -207,11 +209,11 @@ public class DetailManager implements IDetailManager {
 				createBranchAlerts(dr, syscatId);
 				
 				dr.add(TYPENAME_COMPOUND, 
-						new ALCatalogsBelongDirectlyToCatalog(targetId, null, 10, 8, 5), 
-						new ALCatalogsBelongDirectlyToCatalog(cat.getParentCatalogId(), targetId, 10, 8, 3));
+						new ALCatalogsBelongToCatalog(targetId, null, DIRECT, 10, 8, 5), 
+						new ALCatalogsBelongToCatalog(cat.getParentCatalogId(), targetId, DIRECT, 10, 8, 3));
 				
 				//5 active promotions from this branch in one compound
-				dr.add(new ALPromotionsBelongDirectlyToSyscat(syscatId, cat.branchId, 10, 5, 5));
+				dr.add(new ALPromotionsBelongToSyscat(syscatId, null, cat.branchId, DIRECT, clusterId, 10, 5, 5));
 				
 				//5 feature items from this catalog
 				dr.add(new ALItemBelongToCatalog(targetId, null, RECURSIVE, 10, 5, 5));
@@ -220,7 +222,7 @@ public class DetailManager implements IDetailManager {
 				//ja = StoreDriller.findStoresOfBranch(cat.branchId, cat.storeId, 0, 8);
 				dr.add(TYPENAME_COMPOUND_BRANCHSTORE, 
 						new ALStoresBelongToBranch(cat.branchId, cat.storeId, 10, 8, 5), 
-						new ALBranchesBelongDirectlyToSyscat(syscatId, cat.branchId, 10, 8, 3));
+						new ALBranchesBelongToSyscat(syscatId, cat.branchId, DIRECT, 10, 8, 3));
 				return dr;
 			}
 			
@@ -241,7 +243,7 @@ public class DetailManager implements IDetailManager {
 				
 				dr.add(catItem);
 				dr.add(new ALItemBelongToCatalog(cat.getId(), targetId, RECURSIVE, 10, 10, 10));
-				dr.add(new ALCatalogsBelongDirectlyToCatalog(cat.getParentCatalogId(), catItem.getCatalogId(), 10, 8, 5));
+				dr.add(new ALCatalogsBelongToCatalog(cat.getParentCatalogId(), catItem.getCatalogId(), DIRECT, 10, 8, 5));
 				return dr;
 				/*Catalog cat = (Catalog) new CatalogDao().loadCatalog(targetId, false);
 				JsonArray ja = findSubCatalogs(targetId, null, 8);
@@ -267,8 +269,15 @@ public class DetailManager implements IDetailManager {
 		drillers[TYPE_PROMO] = new DetailDriller() {
 			
 			@Override
-			public DrillResult drill(int clusterId, String targetId, String targetSyscat, BigDecimal lon, BigDecimal lat/*, int page, int size*/) throws SQLException {
+			public DrillResult drill(int clusterId, String targetId, String targetSyscat, BigDecimal lon, BigDecimal lat) throws SQLException {
 
+				Promotion p = new PromotionDao().load(targetId);
+				DrillResult dr = createDefaultDrills(clusterId, lon, lat);
+				createBranchAlerts(dr, p.branchId);
+				
+				dr.add(p);
+				dr.add(new ALPromotionsBelongToSyscat(p.syscatId, targetId, p.branchId, RECURSIVE, clusterId, 10, 10, 10));
+				return dr;
 				
 				//At most 5 stores belong to this branch and 3 similar branches
 				/*DrillResult dr = new DrillResult();
@@ -292,7 +301,6 @@ public class DetailManager implements IDetailManager {
 				//Gson gson = new GsonBuilder().setPrettyPrinting().create();
 				//return gson.toJson(dr);
 				return dr.toString();*/
-				return null;
 			}
 		};
 	}

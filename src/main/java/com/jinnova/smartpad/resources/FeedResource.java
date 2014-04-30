@@ -25,7 +25,7 @@ public class FeedResource {
         this.defaultSearchNoFound = defaultSearchNoFound;
     }
     
-    @Path("feeds")
+    //@Path("feeds")
     @GET
     public String getFeed(@QueryParam("u")String uid, @QueryParam("verTarget")String verTarget, @QueryParam("verLatest")String verLatest, 
     		@QueryParam("lon")String lon, @QueryParam("lat")String lat, 

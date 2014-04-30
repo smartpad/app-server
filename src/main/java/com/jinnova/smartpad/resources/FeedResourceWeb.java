@@ -12,15 +12,15 @@ import javax.ws.rs.core.MediaType;
 import com.jinnova.smartpad.drilling.DetailManager;
 import com.jinnova.smartpad.partner.IDetailManager;
 
-@Path("/test")
+@Path("/w")
 @Produces(MediaType.TEXT_HTML + ";charset=utf-8")
-public class FeedResourceTest extends FeedResource {
+public class FeedResourceWeb extends FeedResource {
 
-    public FeedResourceTest(String defaultSearchNoFound) {
+    public FeedResourceWeb(String defaultSearchNoFound) {
     	super(defaultSearchNoFound);
     }
     
-    @Path("feeds")
+    //@Path("feeds")
     @GET
     public String getFeed(@QueryParam("u")String uid, @QueryParam("verTarget")String verTarget, @QueryParam("verLatest")String verLatest, 
     		@QueryParam("lon")String lon, @QueryParam("lat")String lat, 
