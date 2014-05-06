@@ -1,5 +1,7 @@
 package com.jinnova.smartpad.drilling;
 
+import static com.jinnova.smartpad.Feed.*;
+
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -76,7 +78,8 @@ public class DetailManager implements IDetailManager {
 	@Override
 	public String more(int clusterId, String targetType, String anchorType, String anchorId, String relation,
 			String branchId, String storeId, String catId, String syscatId, String excludeId,
-			boolean recursive, String gpsLon, String gpsLat, int offset, int size) throws SQLException {
+			boolean recursive, String gpsLon, String gpsLat, int offset, int size, 
+			int layoutOptions, String layoutSyscat) throws SQLException {
 		
 		ActionLoad action = ActionLoad.createLoad(targetType, anchorType, relation);
 		action.clusterId = clusterId;
@@ -85,6 +88,8 @@ public class DetailManager implements IDetailManager {
 		action.offset = offset;
 		action.pageSize = size;
 		action.recursive = recursive;
+		action.layopts(layoutOptions);
+		action.laysc(layoutSyscat);
 		if (gpsLon != null) {
 			action.gpsLon = new BigDecimal(gpsLon);
 		}
@@ -95,12 +100,12 @@ public class DetailManager implements IDetailManager {
 		Object[] data = action.load();
 		JsonArray array = new JsonArray();
 		for (int i = 0; i < data.length; i++) {
-			array.add(((Feed) data[i]).generateFeedJson());
+			array.add(((Feed) data[i]).generateFeedJson(layoutOptions, layoutSyscat));
 		}
 		
 		JsonObject json = new JsonObject();
-		json.add(IDetailManager.FIELD_ARRAY, array);
-		json.addProperty(IDetailManager.FIELD_ACTION_LOADNEXT, action.generateNextLoadUrl());
+		json.add(FIELD_ARRAY, array);
+		json.addProperty(FIELD_ACTION_LOADNEXT, action.generateNextLoadUrl());
 		//System.out.println("next load: " + actionLoad.generateNextLoadUrl());
 		return json.toString();
 	}
@@ -138,7 +143,9 @@ public class DetailManager implements IDetailManager {
 				DrillResult dr = createDefaultDrills(clusterId, lon, lat);
 				createSyscatAlerts(dr, syscatId);
 				dr.add(new ALBranchesBelongToSyscat(syscatId, null, RECURSIVE, 10, 10, 10));
-				dr.add(new ALItemBelongToSyscat(syscatId, RECURSIVE, 10, 10, 10));
+				dr.add(new ALItemBelongToSyscat(syscatId, RECURSIVE, 10, 10, 10)
+					.layopts(LAYOPT_WITHBRANCH | LAYOPT_WITHSYSCAT)
+					.laysc(syscatId));
 				return dr;
 			}
 		};
@@ -148,9 +155,14 @@ public class DetailManager implements IDetailManager {
 			public DrillResult drill(int clusterId, String branchId, String targetSyscat, BigDecimal lon, BigDecimal lat/*, int page, int size*/) throws SQLException {
 				
 				OperationDao odao = new OperationDao();
-				String syscatId = odao.loadBranch(branchId).getSyscatId();
+				Operation branch = odao.loadBranch(branchId);
+				String syscatId = branch.getSyscatId();
 				DrillResult dr = createDefaultDrills(clusterId, lon, lat);
 				createSyscatAlerts(dr, syscatId);
+				
+				//details of this branch
+				dr.add(branch);
+				dr.layoutOptions = LAYOPT_WITHSYSCAT;
 
 				//At most 5 stores belong to this branch and 3 similar branches
 				dr.add(TYPENAME_COMPOUND_BRANCHSTORE, 
@@ -161,10 +173,10 @@ public class DetailManager implements IDetailManager {
 				dr.add(new ALPromotionsBelongToSyscat(syscatId, null, branchId, DIRECT, clusterId, 10, 5, 5));
 				
 				//10 sub categories of this branch's root category in one compound
-				dr.add(new ALCatalogsBelongToCatalog(branchId, null, DIRECT, 10, 10, 10));
+				//dr.add(new ALCatalogsBelongToCatalog(branchId, null, DIRECT, 10, 10, 10));
 				
 				//catelog items from this branch's root category
-				dr.add(new ALItemBelongToCatalog(branchId, null, DIRECT, 20, 20, 20));
+				dr.add(new ALItemBelongToCatalog(branchId, null, RECURSIVE, 20, 20, 20).layopts(Feed.LAYOPT_WITHCAT));
 				return dr;
 			}
 		};

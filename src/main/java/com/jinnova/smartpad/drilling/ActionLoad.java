@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.HashMap;
 
+import com.jinnova.smartpad.Feed;
 import com.jinnova.smartpad.db.CatalogDao;
 import com.jinnova.smartpad.db.CatalogItemDao;
 import com.jinnova.smartpad.db.OperationDao;
@@ -59,6 +60,10 @@ abstract class ActionLoad {
 	
 	boolean recursive = false;
 	
+	private int layoutOptions = Feed.LAYOPT_NONE;
+	
+	private String layoutSyscat;
+	
 	static void initialize() {
 		actionClasses = new HashMap<String, Class<? extends ActionLoad>>();
 		register(new ALBranchesBelongToSyscat());
@@ -98,6 +103,24 @@ abstract class ActionLoad {
 	
 	void setOffset(int offset) {
 		this.offset = offset;
+	}
+	
+	int getLayopts() {
+		return this.layoutOptions;
+	}
+	
+	ActionLoad layopts(int layoutOptions) {
+		this.layoutOptions = layoutOptions;
+		return this;
+	}
+	
+	String getLayoutSyscat() {
+		return this.layoutSyscat;
+	}
+	
+	ActionLoad laysc(String layoutSyscat) {
+		this.layoutSyscat = layoutSyscat;
+		return this;
 	}
 	
 	ActionLoad(String anchorType, String targetType, String relation) {
@@ -155,6 +178,10 @@ abstract class ActionLoad {
 			buffer.append("&lat=" + gpsLat.toPlainString());
 		}
 		buffer.append("&recur=" + recursive);
+		buffer.append("&layopts=" + layoutOptions);
+		if (layoutSyscat != null) {
+			buffer.append("&laysc=" + layoutSyscat);
+		}
 		return buffer.toString();
 	}
 	

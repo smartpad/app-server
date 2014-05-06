@@ -27,6 +27,6 @@ public class Branch {
 	}
 	
 	public String getName() {
-		return branch.getName().getName();
+		return branch.getName();
 	}
 }

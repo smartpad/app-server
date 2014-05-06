@@ -27,7 +27,7 @@ public class Promotion {
 	}
 	
 	public String getName() {
-		return promo.getName().getName();
+		return promo.getName();
 	}
 
 }

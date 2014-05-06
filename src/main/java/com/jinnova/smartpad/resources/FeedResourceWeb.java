@@ -2,6 +2,7 @@ package com.jinnova.smartpad.resources;
 
 import java.sql.SQLException;
 
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -9,6 +10,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
+import com.jinnova.smartpad.Feed;
 import com.jinnova.smartpad.drilling.DetailManager;
 import com.jinnova.smartpad.partner.IDetailManager;
 
@@ -67,10 +69,12 @@ public class FeedResourceWeb extends FeedResource {
     		@QueryParam("excludeId") String excludeId,
     		
     		@QueryParam("recur")boolean recursive, @QueryParam("lon")String lon, @QueryParam("lat")String lat, 
-    		@QueryParam("offset")int offset, @QueryParam("size")int size) throws SQLException {
+    		@QueryParam("offset")int offset, @QueryParam("size")int size, 
+    		@QueryParam("layopts") @DefaultValue("" + Feed.LAYOPT_NONE) int layoutOptions,
+    		@QueryParam("laysc") String layoutSyscat) throws SQLException {
 
     	String s = super.more(clusterId, targetType, relation, anchorType, anchorId, 
-    			branchId, storeId, catId, syscatId, excludeId, recursive, lon, lat, offset, size);
+    			branchId, storeId, catId, syscatId, excludeId, recursive, lon, lat, offset, size, layoutOptions, layoutSyscat);
 		return new RenderLinkJob(s).render();
     }
     

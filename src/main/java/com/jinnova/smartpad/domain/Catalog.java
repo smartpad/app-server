@@ -27,7 +27,7 @@ public class Catalog {
 	}
 	
 	public String getName() {
-		return cat.getName().getName();
+		return cat.getName();
 	}
 
 }

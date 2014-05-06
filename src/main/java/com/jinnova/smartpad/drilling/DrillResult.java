@@ -16,6 +16,10 @@ class DrillResult {
 	
 	private LinkedList<Feed> feeds = new LinkedList<Feed>();
 	
+	//layout options for above feeds
+	int layoutOptions = Feed.LAYOPT_NONE;
+	String layoutSyscat;
+	
 	private final int clusterId;
 	private final BigDecimal lon;
 	private final BigDecimal lat;
@@ -24,79 +28,6 @@ class DrillResult {
 		this.clusterId = clusterId;
 		this.lon = lon;
 		this.lat = lat;
-	}
-	
-	private class DrillSectionTwin implements DrillSection {
-		
-		String sectionType;
-		DrillSectionSimple section1, section2;
-		
-		DrillSectionSimple flatenSection;
-		
-		DrillSectionTwin(String sectionType, DrillSectionSimple section1, DrillSectionSimple section2) {
-			this.sectionType = sectionType;
-			this.section1 = section1;
-			this.section2 = section2;
-		}
-		
-		@Override
-		public boolean copyTo(LinkedList<JsonObject> jsonList) {
-			
-			//flatten if needed
-			if (section1.isEmpty()) {
-				section2.expectedSize = section2.ja.length;
-				flatenSection = section2;
-				return section2.copyTo(jsonList);
-			}
-			if (section2.isEmpty()) {
-				section1.expectedSize = section1.ja.length;
-				flatenSection = section1;
-				return section1.copyTo(jsonList);
-			}
-			
-			//adjust sizes
-			if (section1.ja.length < section1.expectedSize) {
-				section2.expectedSize += section1.expectedSize - section1.ja.length;
-			} else if (section2.ja.length < section2.expectedSize) {
-				section1.expectedSize += section2.expectedSize - section2.ja.length;
-			}
-			
-			boolean copied = section1.copyTo(jsonList);
-			if (copied) {
-				flatenSection = section1;
-			}
-			if (section2.copyTo(jsonList)) {
-				flatenSection = section2;
-				copied = true;
-			}
-			
-			return copied;
-			
-		}
-		
-		@Override
-		public JsonObject getJson() {
-			
-			LinkedList<JsonObject> jsonList = new LinkedList<>();
-			if (!copyTo(jsonList)) {
-				return null;
-			}
-			
-			if (jsonList.size() == 1) {
-				//flatten
-				return jsonList.get(0);
-			}
-			
-			JsonObject json = new JsonObject();
-			json.addProperty(IDetailManager.FIELD_TYPE, sectionType);
-			
-			JsonArray ja = new JsonArray();
-			for (JsonObject o : jsonList) {
-				ja.add(o);
-			}
-			json.add(IDetailManager.FIELD_ARRAY, ja);
-			return json;
-		}
 	}
 	
 	void add(ActionLoad actionLoad) throws SQLException {
@@ -149,7 +80,7 @@ class DrillResult {
 		}
 		
 		for (Feed f : feeds) {
-			jsonList.add(f.generateFeedJson());
+			jsonList.add(f.generateFeedJson(layoutOptions, layoutSyscat));
 		}
 		
 		JsonArray ja = new JsonArray();
@@ -172,6 +103,7 @@ class DrillSectionSimple implements DrillSection {
 	private String sectionType;
 	Object[] ja;
 	int expectedSize;
+	//private int layoutOptions = Feed.LAYOPT_NONE;
 	
 	ActionLoad actionLoad;
 	
@@ -202,17 +134,21 @@ class DrillSectionSimple implements DrillSection {
 	
 	@Override
 	public JsonObject getJson() {
+		
 		if (ja == null || ja.length == 0) {
 			return null;
 		}
+		
+		int layOpts = actionLoad.getLayopts();
+		String layoutSyscat = actionLoad.getLayoutSyscat();
 		if (ja.length == 1) {
-			return ((Feed) ja[0]).generateFeedJson();
+			return ((Feed) ja[0]).generateFeedJson(layOpts, layoutSyscat);
 		}
 		
 		JsonArray array = new JsonArray();
 		int actualCount = Math.min(expectedSize, ja.length);
 		for (int i = 0; i < actualCount; i++) {
-			array.add(((Feed) ja[i]).generateFeedJson());
+			array.add(((Feed) ja[i]).generateFeedJson(layOpts, layoutSyscat));
 		}
 		
 		JsonObject json = new JsonObject();
@@ -239,11 +175,86 @@ class DrillSectionSimple implements DrillSection {
 		
 		boolean copied = false;
 		int actualCount = Math.min(expectedSize, ja.length);
+		int layOpts = actionLoad.getLayopts();
+		String layoutSyscat = actionLoad.getLayoutSyscat();
 		for (int i = 0; i < actualCount; i++) {
-			jsonList.add(((Feed) ja[i]).generateFeedJson());
+			jsonList.add(((Feed) ja[i]).generateFeedJson(layOpts, layoutSyscat));
 			copied = true;
 		}
 		actionLoad.setOffset(actualCount);
 		return copied;
+	}
+}
+
+class DrillSectionTwin implements DrillSection {
+	
+	String sectionType;
+	DrillSectionSimple section1, section2;
+	
+	DrillSectionSimple flatenSection;
+	
+	DrillSectionTwin(String sectionType, DrillSectionSimple section1, DrillSectionSimple section2) {
+		this.sectionType = sectionType;
+		this.section1 = section1;
+		this.section2 = section2;
+	}
+	
+	@Override
+	public boolean copyTo(LinkedList<JsonObject> jsonList) {
+		
+		//flatten if needed
+		if (section1.isEmpty()) {
+			section2.expectedSize = section2.ja.length;
+			flatenSection = section2;
+			return section2.copyTo(jsonList);
+		}
+		if (section2.isEmpty()) {
+			section1.expectedSize = section1.ja.length;
+			flatenSection = section1;
+			return section1.copyTo(jsonList);
+		}
+		
+		//adjust sizes
+		if (section1.ja.length < section1.expectedSize) {
+			section2.expectedSize += section1.expectedSize - section1.ja.length;
+		} else if (section2.ja.length < section2.expectedSize) {
+			section1.expectedSize += section2.expectedSize - section2.ja.length;
+		}
+		
+		boolean copied = section1.copyTo(jsonList);
+		if (copied) {
+			flatenSection = section1;
+		}
+		if (section2.copyTo(jsonList)) {
+			flatenSection = section2;
+			copied = true;
+		}
+		
+		return copied;
+		
+	}
+	
+	@Override
+	public JsonObject getJson() {
+		
+		LinkedList<JsonObject> jsonList = new LinkedList<>();
+		if (!copyTo(jsonList)) {
+			return null;
+		}
+		
+		if (jsonList.size() == 1) {
+			//flatten
+			return jsonList.get(0);
+		}
+		
+		JsonObject json = new JsonObject();
+		json.addProperty(IDetailManager.FIELD_TYPE, sectionType);
+		
+		JsonArray ja = new JsonArray();
+		for (JsonObject o : jsonList) {
+			ja.add(o);
+		}
+		json.add(IDetailManager.FIELD_ARRAY, ja);
+		return json;
 	}
 }

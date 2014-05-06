@@ -27,7 +27,7 @@ public class Shop {
 	}
 	
 	public String getName() {
-		return shop.getName().getName();
+		return shop.getName();
 	}
 
 }

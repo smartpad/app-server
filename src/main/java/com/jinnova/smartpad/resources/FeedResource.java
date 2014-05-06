@@ -4,6 +4,7 @@ import static com.jinnova.smartpad.partner.IDetailManager.CLUSPRE;
 
 import java.sql.SQLException;
 
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -11,6 +12,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
+import com.jinnova.smartpad.Feed;
 import com.jinnova.smartpad.drilling.DetailManager;
 import com.jinnova.smartpad.partner.IDetailManager;
 
@@ -81,73 +83,12 @@ public class FeedResource {
     		@QueryParam("excludeId") String excludeId,
     		
     		@QueryParam("recur")boolean recursize, @QueryParam("lon")String lon, @QueryParam("lat")String lat, 
-    		@QueryParam("offset")int offset, @QueryParam("size")int size) throws SQLException {
+    		@QueryParam("offset")int offset, @QueryParam("size")int size, 
+    		@QueryParam("layopts") @DefaultValue("" + Feed.LAYOPT_NONE) int layoutOptions,
+    		@QueryParam("laysc") String layoutSyscat) throws SQLException {
 
     	return new DetailManager().more(clusterId, targetType, anchorType, anchorId, relation, 
-    			branchId, storeId, catId, syscatId, excludeId, recursize, lon, lat, offset, size);
+    			branchId, storeId, catId, syscatId, excludeId, recursize, lon, lat, offset, size, layoutOptions, layoutSyscat);
     }
-    
-    /*@Path("feeds")
-    @GET
-    public String getFeed(@QueryParam("verTarget")String verTarget, @QueryParam("verLatest")String verLatest, 
-    		@QueryParam("lon")String lon, @QueryParam("lat")String lat, 
-    		@QueryParam("offset")int offset, @QueryParam("size")int size) throws SQLException {
-    	
-    	if (offset < 0) {
-    		return new JsonResponse(false, null, "Negative offset: " + offset);
-    	}
-
-    	int i = 0;
-    	List<Object> feeds = new LinkedList<Object>();
-    	feeds.add(new Post(i++));
-    	
-    	IPartnerManager pm = SmartpadCommon.partnerManager;
-    	IUser lotte = pm.login("lotte", "123abc");
-    	
-    	i = gen(lotte, feeds, pm.getSystemRootCatalog(), i);
-    	
-		feeds.add(new Branch(lotte.getBranch(), i++));
-    	i = gen(lotte, feeds, lotte.getBranch(), i);
-		i = gen(lotte, feeds, lotte.getBranch().getRootCatalog(), i);
-		
-		lotte.getStorePagingList().setPageSize(-1);
-		for (IOperation shop : lotte.getStorePagingList().loadPage(lotte, 1).getPageEntries()) {
-			feeds.add(new Shop(shop, i++));
-	    	i = gen(lotte, feeds, shop, i);
-			i = gen(lotte, feeds, shop.getRootCatalog(), i);
-		}
-		
-    	JsonResponse response = new JsonResponse(true);
-    	response.put("v", "a");
-    	response.put("t", feeds);
-    	return response;
-    }*/
-    
-    /*private static int gen(IUser u, List<Object> feeds, IOperation op, int i) throws SQLException {
-    	op.getPromotionPagingList().setPageSize(-1);
-    	for (IPromotion promo : op.getPromotionPagingList().loadPage(u, 1).getPageEntries()) {
-    		feeds.add(new Promotion(promo, i++));
-    	}
-    	return i;
-    }
-    
-    private static int gen(IUser u, List<Object> feeds, ICatalog cat, int i) throws SQLException {
-    	
-		//feeds.add(new Catalog(cat, i++));
-		
-    	if (cat.getCatalogSpec() == null) {
-			cat.getCatalogItemPagingList().setPageSize(-1);
-			for (ICatalogItem ci : cat.getCatalogItemPagingList().loadPage(u, 1).getPageEntries()) {
-				feeds.add(new CatalogItem(ci, i++));
-			}
-    	}
-		
-		cat.getSubCatalogPagingList().setPageSize(-1);
-		for (ICatalog sub : cat.getSubCatalogPagingList().loadPage(u, 1).getPageEntries()) {
-			feeds.add(new Catalog(sub, i++));
-			i = gen(u, feeds, sub, i);
-		}
-    	return i;
-    }*/
     
 }
