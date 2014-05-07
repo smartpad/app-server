@@ -59,11 +59,13 @@ class RenderLinkJob {
 								json.get(FIELD_ID).getAsString() + "/drill" + "'>" + value + "</a>";
 					}
 				} else if (FIELD_SYSCATNAME.equals(entry.getKey())) {
-					html = "<a href='" + HOST + "syscat/" + json.get(FIELD_SYSCATID).getAsString() + "/drill" + "'>" + value + "</a>";
+					html = "<a href='" + HOST + TYPENAME_SYSCAT + "/" + json.get(FIELD_SYSCATID).getAsString() + "/drill" + "'>" + value + "</a>";
 				} else if (FIELD_BRANCHNAME.equals(entry.getKey())) {
 					html = "<a href='" + HOST + TYPENAME_BRANCH + "/" + json.get(FIELD_BRANCHID).getAsString() + "/drill" + "'>" + value + "</a>";
 				} else if (FIELD_CATNAME.equals(entry.getKey())) {
 					html = "<a href='" + HOST + TYPENAME_CAT + "/" + json.get(FIELD_CATID).getAsString() + "/drill" + "'>" + value + "</a>";
+				} else if (FIELD_UP_NAME.equals(entry.getKey())) {
+					html = "<a href='" + HOST + json.get(FIELD_TYPE).getAsString() + "/" + json.get(FIELD_UP_ID).getAsString() + "/drill" + "'>" + value + "</a>";
 				}
 				buffer.append(html);
 			} else if (entry.getValue().isJsonArray()) {

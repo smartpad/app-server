@@ -142,6 +142,11 @@ public class DetailManager implements IDetailManager {
 				
 				DrillResult dr = createDefaultDrills(clusterId, lon, lat);
 				createSyscatAlerts(dr, syscatId);
+				
+				Catalog cat = (Catalog) PartnerManager.instance.getSystemCatalog(syscatId);
+				dr.add(cat);
+				//dr.layoutOptions = LAYOPT_WITHSYSCAT;
+				
 				dr.add(new ALBranchesBelongToSyscat(syscatId, null, RECURSIVE, 10, 10, 10));
 				dr.add(new ALItemBelongToSyscat(syscatId, RECURSIVE, 10, 10, 10)
 					.layopts(LAYOPT_WITHBRANCH | LAYOPT_WITHSYSCAT)
@@ -189,6 +194,9 @@ public class DetailManager implements IDetailManager {
 				DrillResult dr = createDefaultDrills(clusterId, lon, lat);
 				createSyscatAlerts(dr, targetStore.getSyscatId());
 				
+				dr.add(targetStore);
+				dr.layoutOptions = LAYOPT_WITHBRANCH | LAYOPT_WITHSYSCAT;
+				
 				//5 stores belong in same branch with this store, and 3 similar branches
 				dr.add(TYPENAME_COMPOUND_BRANCHSTORE, 
 						new ALStoresBelongToBranch(targetStore.getBranchId(), targetId, 10, 8, 5), 
@@ -220,9 +228,12 @@ public class DetailManager implements IDetailManager {
 				DrillResult dr = createDefaultDrills(clusterId, lon, lat);
 				createBranchAlerts(dr, syscatId);
 				
-				dr.add(TYPENAME_COMPOUND, 
+				dr.add(cat);
+				dr.layoutOptions = LAYOPT_WITHSYSCAT | LAYOPT_WITHBRANCH;
+				
+				/*dr.add(TYPENAME_COMPOUND, 
 						new ALCatalogsBelongToCatalog(targetId, null, DIRECT, 10, 8, 5), 
-						new ALCatalogsBelongToCatalog(cat.getParentCatalogId(), targetId, DIRECT, 10, 8, 3));
+						new ALCatalogsBelongToCatalog(cat.getParentCatalogId(), targetId, DIRECT, 10, 8, 3));*/
 				
 				//5 active promotions from this branch in one compound
 				dr.add(new ALPromotionsBelongToSyscat(syscatId, null, cat.branchId, DIRECT, clusterId, 10, 5, 5));
@@ -235,6 +246,9 @@ public class DetailManager implements IDetailManager {
 				dr.add(TYPENAME_COMPOUND_BRANCHSTORE, 
 						new ALStoresBelongToBranch(cat.branchId, cat.storeId, 10, 8, 5), 
 						new ALBranchesBelongToSyscat(syscatId, cat.branchId, DIRECT, 10, 8, 3));
+				
+				//remain items from this catalog
+				//dr.add(new ALItemBelongToCatalog(targetId, null, RECURSIVE, 10, 5, 5));
 				return dr;
 			}
 			
@@ -248,14 +262,17 @@ public class DetailManager implements IDetailManager {
 				//String itemId = targetId.substring(0, targetId.indexOf('_'));
 				//String syscatId = targetId.substring(itemId.length() + 1);
 				CatalogItem catItem = new CatalogItemDao().loadCatalogItem(targetId, PartnerManager.instance.getCatalogSpec(targetSyscat));
-				Catalog cat = new CatalogDao().loadCatalog(catItem.getCatalogId(), false);
+				//Catalog cat = new CatalogDao().loadCatalog(catItem.getCatalogId(), false);
 
 				DrillResult dr = createDefaultDrills(clusterId, lon, lat);
-				createBranchAlerts(dr, cat.branchId);
+				createBranchAlerts(dr, catItem.branchId);
 				
 				dr.add(catItem);
-				dr.add(new ALItemBelongToCatalog(cat.getId(), targetId, RECURSIVE, 10, 10, 10));
-				dr.add(new ALCatalogsBelongToCatalog(cat.getParentCatalogId(), catItem.getCatalogId(), DIRECT, 10, 8, 5));
+				dr.layoutOptions = LAYOPT_WITHBRANCH | LAYOPT_WITHSYSCAT | LAYOPT_WITHCAT;
+				
+				dr.add(new ALItemBelongToCatalog(catItem.getCatalogId(), targetId, RECURSIVE, 10, 10, 10).layopts(LAYOPT_WITHCAT)
+						.laysc(catItem.getCatalogId())); //TODO exclude name of this catalog
+				//dr.add(new ALCatalogsBelongToCatalog(cat.getParentCatalogId(), catItem.getCatalogId(), DIRECT, 10, 8, 5));
 				return dr;
 				/*Catalog cat = (Catalog) new CatalogDao().loadCatalog(targetId, false);
 				JsonArray ja = findSubCatalogs(targetId, null, 8);
