@@ -11,6 +11,7 @@ import com.jinnova.smartpad.db.CatalogDao;
 import com.jinnova.smartpad.db.CatalogItemDao;
 import com.jinnova.smartpad.db.OperationDao;
 import com.jinnova.smartpad.db.PromotionDao;
+import com.jinnova.smartpad.partner.PartnerManager;
 
 abstract class ActionLoad {
 	
@@ -265,15 +266,17 @@ class ALItemBelongToCatalog extends ActionLoad {
 		super(TYPENAME_CAT, TYPENAME_CATITEM, REL_BELONG);
 	}
 
-	ALItemBelongToCatalog(String catId, String excludeItemId, 
+	ALItemBelongToCatalog(String catId, String syscatId, String excludeItemId, 
 			boolean recursive, int pageSize, int initialLoadSize, int initialDrillSize) {
 		this();
 		setParams(catId, excludeItemId, recursive, pageSize, initialLoadSize, initialDrillSize);
+		super.syscatId = syscatId;
 	}
 
 	@Override
 	Object[] load(int offset, int size) throws SQLException {
-		return new CatalogItemDao().iterateItemsByCatalog(anchorId, excludeId, recursive, gpsLon, gpsLat, offset, size).toArray();
+		String specId = PartnerManager.instance.getCatalogSpec(syscatId).getSpecId();
+		return new CatalogItemDao().iterateItemsByCatalog(anchorId, specId, excludeId, recursive, gpsLon, gpsLat, offset, size).toArray();
 	}
 	
 }

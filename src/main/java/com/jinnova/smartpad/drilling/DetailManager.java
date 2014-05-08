@@ -181,7 +181,7 @@ public class DetailManager implements IDetailManager {
 				//dr.add(new ALCatalogsBelongToCatalog(branchId, null, DIRECT, 10, 10, 10));
 				
 				//catelog items from this branch's root category
-				dr.add(new ALItemBelongToCatalog(branchId, null, RECURSIVE, 20, 20, 20).layopts(Feed.LAYOPT_WITHCAT));
+				dr.add(new ALItemBelongToCatalog(branchId, syscatId, null, RECURSIVE, 20, 20, 20).layopts(Feed.LAYOPT_WITHCAT));
 				return dr;
 			}
 		};
@@ -239,7 +239,7 @@ public class DetailManager implements IDetailManager {
 				dr.add(new ALPromotionsBelongToSyscat(syscatId, null, cat.branchId, DIRECT, clusterId, 10, 5, 5));
 				
 				//5 feature items from this catalog
-				dr.add(new ALItemBelongToCatalog(targetId, null, RECURSIVE, 10, 5, 5));
+				dr.add(new ALItemBelongToCatalog(targetId, syscatId, null, RECURSIVE, 10, 5, 5));
 				
 				//5 other stores, 3 similar branches
 				//ja = StoreDriller.findStoresOfBranch(cat.branchId, cat.storeId, 0, 8);
@@ -270,7 +270,7 @@ public class DetailManager implements IDetailManager {
 				dr.add(catItem);
 				dr.layoutOptions = LAYOPT_WITHBRANCH | LAYOPT_WITHSYSCAT | LAYOPT_WITHCAT;
 				
-				dr.add(new ALItemBelongToCatalog(catItem.getCatalogId(), targetId, RECURSIVE, 10, 10, 10).layopts(LAYOPT_WITHCAT)
+				dr.add(new ALItemBelongToCatalog(catItem.getCatalogId(), catItem.getSyscatId(), targetId, RECURSIVE, 10, 10, 10).layopts(LAYOPT_WITHCAT)
 						.laysc(catItem.getCatalogId())); //TODO exclude name of this catalog
 				//dr.add(new ALCatalogsBelongToCatalog(cat.getParentCatalogId(), catItem.getCatalogId(), DIRECT, 10, 8, 5));
 				return dr;
