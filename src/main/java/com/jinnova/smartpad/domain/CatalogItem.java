@@ -28,7 +28,7 @@ public class CatalogItem {
 	}
 	
 	public String getName() {
-		return ci.getFieldValue(ICatalogField.ID_NAME);
+		return ci.getFieldValue(ICatalogField.F_NAME);
 	}
 
 }

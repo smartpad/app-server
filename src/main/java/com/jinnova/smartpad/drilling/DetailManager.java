@@ -85,6 +85,7 @@ public class DetailManager implements IDetailManager {
 		action.clusterId = clusterId;
 		action.anchorId = anchorId;
 		action.excludeId = excludeId;
+		action.syscatId = syscatId;
 		action.offset = offset;
 		action.pageSize = size;
 		action.recursive = recursive;
@@ -147,7 +148,7 @@ public class DetailManager implements IDetailManager {
 				dr.add(cat);
 				//dr.layoutOptions = LAYOPT_WITHSYSCAT;
 				
-				dr.add(new ALBranchesBelongToSyscat(syscatId, null, RECURSIVE, 10, 10, 10));
+				dr.add(new ALBranchesBelongToSyscat(syscatId, null, RECURSIVE, 5, 5, 5).layopts(LAYOPT_WITHSYSCAT));
 				dr.add(new ALItemBelongToSyscat(syscatId, RECURSIVE, 10, 10, 10)
 					.layopts(LAYOPT_WITHBRANCH | LAYOPT_WITHSYSCAT)
 					.laysc(syscatId));
@@ -223,6 +224,12 @@ public class DetailManager implements IDetailManager {
 					syscatId = cat.getSystemCatalogId();
 				}*/
 				Catalog cat = (Catalog) new CatalogDao().loadCatalog(targetId, false);
+				if (cat == null) {
+					Operation branch = new OperationDao().loadBranch(targetId);
+					if (branch != null) {
+						cat = (Catalog) branch.getRootCatalog();
+					}
+				}
 				String syscatId = cat.getSystemCatalogId();
 
 				DrillResult dr = createDefaultDrills(clusterId, lon, lat);
@@ -265,7 +272,7 @@ public class DetailManager implements IDetailManager {
 				//Catalog cat = new CatalogDao().loadCatalog(catItem.getCatalogId(), false);
 
 				DrillResult dr = createDefaultDrills(clusterId, lon, lat);
-				createBranchAlerts(dr, catItem.branchId);
+				createBranchAlerts(dr, catItem.getBranchId());
 				
 				dr.add(catItem);
 				dr.layoutOptions = LAYOPT_WITHBRANCH | LAYOPT_WITHSYSCAT | LAYOPT_WITHCAT;
