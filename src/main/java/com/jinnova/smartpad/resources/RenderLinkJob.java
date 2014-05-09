@@ -8,6 +8,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.jinnova.smartpad.JsonSupport;
 
 class RenderLinkJob {
 	
@@ -26,7 +27,7 @@ class RenderLinkJob {
 		
 		StringBuffer buffer = new StringBuffer();
 		buffer.append("<html><body>");
-		render(buffer, json);
+		render(buffer, json, null, null);
 		buffer.append("</html></body>");
 		return buffer.toString();
 	}
@@ -36,11 +37,16 @@ class RenderLinkJob {
 		json.addProperty(property, "<a href='" + link + "'>" + link + "</a>");
 	}*/
 	
-	private static void render(StringBuffer buffer, JsonObject json) {
+	private static void render(StringBuffer buffer, JsonObject json, String feedType, JsonObject feedJson) {
 		//renderLink(buffer, json);
 		//renderProp(buffer, json, "type");
 		//renderProp(buffer, json, "name");
 		buffer.append("<table><tbody>");
+		String nextFeedType = JsonSupport.getAsString(json, FIELD_TYPE);
+		if (nextFeedType != null) {
+			feedType = nextFeedType;
+			feedJson = json;
+		}
 		for (Entry<String, JsonElement> entry : json.entrySet()) {
 			
 			buffer.append("<tr><td>");
@@ -66,6 +72,11 @@ class RenderLinkJob {
 					html = "<a href='" + HOST + TYPENAME_CAT + "/" + json.get(FIELD_CATID).getAsString() + "/drill" + "'>" + value + "</a>";
 				} else if (FIELD_UP_NAME.equals(entry.getKey())) {
 					html = "<a href='" + HOST + json.get(FIELD_TYPE).getAsString() + "/" + json.get(FIELD_UP_ID).getAsString() + "/drill" + "'>" + value + "</a>";
+				} else {
+					Renderer r = Renderer.renderers.get(feedType);
+					if (r != null) {
+						html = r.html(feedJson, entry.getKey(), value);
+					}
 				}
 				buffer.append(html);
 			} else if (entry.getValue().isJsonArray()) {
@@ -73,13 +84,13 @@ class RenderLinkJob {
 				buffer.append(entry.getKey() + ": (" + ja.size() + ")");
 				for (int i = 0; i < ja.size(); i++) {
 					buffer.append("<blockquote>");
-					render(buffer, ja.get(i).getAsJsonObject());
+					render(buffer, ja.get(i).getAsJsonObject(), feedType, feedJson);
 					buffer.append("</blockquote>");
 				}
 			} else if (entry.getValue() == null || entry.getValue().isJsonNull()) {
 				buffer.append(entry.getKey() + ": " + entry.getValue());
 			} else {
-				render(buffer, entry.getValue().getAsJsonObject());
+				render(buffer, entry.getValue().getAsJsonObject(), feedType, feedJson);
 			}
 			buffer.append("</td></tr>");
 		}

@@ -21,6 +21,8 @@ abstract class ActionLoad {
 	
 	static final String REL_SIBLING = "sib";
 	
+	static final String REL_SEGMENT = "seg";
+	
 	String branchId;
 	
 	String storeId;
@@ -28,6 +30,8 @@ abstract class ActionLoad {
 	String catId;
 	
 	String syscatId;
+	
+	HashMap<String, String> segments;
 	
 	int clusterId;
 	
@@ -73,6 +77,7 @@ abstract class ActionLoad {
 		register(new ALItemBelongToSyscat());
 		register(new ALPromotionsBelongToSyscat());
 		register(new ALStoresBelongToBranch());
+		register(new ALItemsSegmentedToSyscat());
 		initializing = false;
 	}
 	
@@ -119,7 +124,7 @@ abstract class ActionLoad {
 		return this.layoutSyscat;
 	}
 	
-	ActionLoad laysc(String layoutSyscat) {
+	ActionLoad unshownSyscat(String layoutSyscat) {
 		this.layoutSyscat = layoutSyscat;
 		return this;
 	}
@@ -223,6 +228,28 @@ class ALBranchesBelongToSyscat extends ActionLoad {
 	
 }
 
+class ALItemsSegmentedToSyscat extends ActionLoad {
+	
+	ALItemsSegmentedToSyscat() {
+		super(TYPENAME_SYSCAT, TYPENAME_CATITEM, REL_SEGMENT);
+	}
+
+	ALItemsSegmentedToSyscat(String syscatId, HashMap<String, String> segments,
+			boolean recursive, int pageSize, int initialLoadSize, int initialDrillSize) {
+		this();
+		setParams(syscatId, null, recursive, pageSize, initialLoadSize, initialDrillSize);
+		super.syscatId = syscatId;
+		this.segments = segments;
+	}
+
+	@Override
+	Object[] load(int offset, int size) throws SQLException {
+		String specId = PartnerManager.instance.getCatalogSpec(syscatId).getSpecId();
+		return new CatalogItemDao().iterateItemsBySegment(syscatId, specId, segments, recursive, gpsLon, gpsLat, offset, size).toArray();
+	}
+	
+}
+
 class ALStoresBelongToBranch extends ActionLoad {
 	
 	ALStoresBelongToBranch() {
@@ -294,7 +321,8 @@ class ALItemBelongToSyscat extends ActionLoad {
 
 	@Override
 	Object[] load(int offset, int size) throws SQLException {
-		return new CatalogItemDao().iterateItemsBySyscat(anchorId, clusterId, recursive, gpsLon, gpsLat, offset, size).toArray();
+		String specId = PartnerManager.instance.getCatalogSpec(anchorId).getSpecId();
+		return new CatalogItemDao().iterateItemsBySyscat(anchorId, specId, clusterId, recursive, gpsLon, gpsLat, offset, size).toArray();
 	}
 	
 }

@@ -90,7 +90,7 @@ public class DetailManager implements IDetailManager {
 		action.pageSize = size;
 		action.recursive = recursive;
 		action.layopts(layoutOptions);
-		action.laysc(layoutSyscat);
+		action.unshownSyscat(layoutSyscat);
 		if (gpsLon != null) {
 			action.gpsLon = new BigDecimal(gpsLon);
 		}
@@ -146,12 +146,16 @@ public class DetailManager implements IDetailManager {
 				
 				Catalog cat = (Catalog) PartnerManager.instance.getSystemCatalog(syscatId);
 				dr.add(cat);
-				//dr.layoutOptions = LAYOPT_WITHSYSCAT;
+				dr.layoutOptions = LAYOPT_WITHPARENT | LAYOPT_WITHSEGMENTS;
 				
-				dr.add(new ALBranchesBelongToSyscat(syscatId, null, RECURSIVE, 5, 5, 5).layopts(LAYOPT_WITHSYSCAT));
+				dr.add(new ALBranchesBelongToSyscat(syscatId, null, RECURSIVE, 5, 5, 5)
+					.layopts(LAYOPT_WITHSYSCAT).unshownSyscat(syscatId));
+				
+				dr.add(new ALCatalogsBelongToCatalog(syscatId, null, DIRECT, 5, 5, 5));
+				
 				dr.add(new ALItemBelongToSyscat(syscatId, RECURSIVE, 10, 10, 10)
 					.layopts(LAYOPT_WITHBRANCH | LAYOPT_WITHSYSCAT)
-					.laysc(syscatId));
+					.unshownSyscat(syscatId));
 				return dr;
 			}
 		};
@@ -278,7 +282,7 @@ public class DetailManager implements IDetailManager {
 				dr.layoutOptions = LAYOPT_WITHBRANCH | LAYOPT_WITHSYSCAT | LAYOPT_WITHCAT;
 				
 				dr.add(new ALItemBelongToCatalog(catItem.getCatalogId(), catItem.getSyscatId(), targetId, RECURSIVE, 10, 10, 10).layopts(LAYOPT_WITHCAT)
-						.laysc(catItem.getCatalogId())); //TODO exclude name of this catalog
+						.unshownSyscat(catItem.getCatalogId()));
 				//dr.add(new ALCatalogsBelongToCatalog(cat.getParentCatalogId(), catItem.getCatalogId(), DIRECT, 10, 8, 5));
 				return dr;
 				/*Catalog cat = (Catalog) new CatalogDao().loadCatalog(targetId, false);
