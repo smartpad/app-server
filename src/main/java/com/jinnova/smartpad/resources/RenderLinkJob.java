@@ -14,7 +14,7 @@ class RenderLinkJob {
 	
 	private String content;
 	
-	private static final String HOST = "http://localhost:9090/w/";
+	static final String HOST = "http://localhost:9090/w/";
 
 	RenderLinkJob(String s) {
 		this.content = s;
@@ -75,7 +75,7 @@ class RenderLinkJob {
 				} else {
 					Renderer r = Renderer.renderers.get(feedType);
 					if (r != null) {
-						html = r.html(feedJson, entry.getKey(), value);
+						html = r.html(feedJson, json, entry.getKey(), value);
 					}
 				}
 				buffer.append(html);

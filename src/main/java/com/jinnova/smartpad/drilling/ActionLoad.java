@@ -5,6 +5,8 @@ import static com.jinnova.smartpad.partner.IDetailManager.*;
 import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 
 import com.jinnova.smartpad.Feed;
 import com.jinnova.smartpad.db.CatalogDao;
@@ -31,7 +33,8 @@ abstract class ActionLoad {
 	
 	String syscatId;
 	
-	HashMap<String, String> segments;
+	//HashMap<String, LinkedList<String>> segments;
+	List<String> segments;
 	
 	int clusterId;
 	
@@ -77,7 +80,7 @@ abstract class ActionLoad {
 		register(new ALItemBelongToSyscat());
 		register(new ALPromotionsBelongToSyscat());
 		register(new ALStoresBelongToBranch());
-		register(new ALItemsSegmentedToSyscat());
+		//register(new ALItemsSegmentedToSyscat());
 		initializing = false;
 	}
 	
@@ -177,6 +180,11 @@ abstract class ActionLoad {
 		if (excludeId != null) {
 			buffer.append("&excludeId=" + excludeId);
 		}
+		if (segments != null) {
+			for (String one : segments) {
+				buffer.append("&segments=" + one);
+			}
+		}
 		if (gpsLon != null) {
 			buffer.append("&lon=" + gpsLon.toPlainString());
 		}
@@ -207,6 +215,27 @@ abstract class ActionLoad {
 		offset += result.length;
 		return result;
 	}
+	
+	HashMap<String, LinkedList<String>> buildSegmentMap() {
+		if (segments == null) {
+			return null;
+		}
+		HashMap<String, LinkedList<String>> segmentMap = new HashMap<>();
+		for (String one : segments) {
+			int index = one.indexOf(':');
+			if (index + 1 >= one.length()) {
+				continue;
+			}
+			String oneKey = one.substring(0, index);
+			LinkedList<String> valueList = segmentMap.get(oneKey);
+			if (valueList == null) {
+				valueList = new LinkedList<>();
+				segmentMap.put(oneKey, valueList);
+			}
+			valueList.add(one.substring(index + 1));
+		}
+		return segmentMap;
+	}
 }
 
 class ALBranchesBelongToSyscat extends ActionLoad {
@@ -228,13 +257,13 @@ class ALBranchesBelongToSyscat extends ActionLoad {
 	
 }
 
-class ALItemsSegmentedToSyscat extends ActionLoad {
+/*class ALItemsSegmentedToSyscat extends ActionLoad {
 	
 	ALItemsSegmentedToSyscat() {
 		super(TYPENAME_SYSCAT, TYPENAME_CATITEM, REL_SEGMENT);
 	}
 
-	ALItemsSegmentedToSyscat(String syscatId, HashMap<String, String> segments,
+	ALItemsSegmentedToSyscat(String syscatId, HashMap<String, LinkedList<String>> segments,
 			boolean recursive, int pageSize, int initialLoadSize, int initialDrillSize) {
 		this();
 		setParams(syscatId, null, recursive, pageSize, initialLoadSize, initialDrillSize);
@@ -245,10 +274,10 @@ class ALItemsSegmentedToSyscat extends ActionLoad {
 	@Override
 	Object[] load(int offset, int size) throws SQLException {
 		String specId = PartnerManager.instance.getCatalogSpec(syscatId).getSpecId();
-		return new CatalogItemDao().iterateItemsBySegment(syscatId, specId, segments, recursive, gpsLon, gpsLat, offset, size).toArray();
+		return new CatalogItemDao().iterateItemsBySegment(syscatId, specId, clusterId, segments, recursive, gpsLon, gpsLat, offset, size).toArray();
 	}
 	
-}
+}*/
 
 class ALStoresBelongToBranch extends ActionLoad {
 	
@@ -314,15 +343,16 @@ class ALItemBelongToSyscat extends ActionLoad {
 		super(TYPENAME_SYSCAT, TYPENAME_CATITEM, REL_BELONG);
 	}
 
-	ALItemBelongToSyscat(String syscatId, boolean recursive, int pageSize, int initialLoadSize, int initialDrillSize) {
+	ALItemBelongToSyscat(String syscatId, List<String> segmentList, boolean recursive, int pageSize, int initialLoadSize, int initialDrillSize) {
 		this();
 		setParams(syscatId, null, recursive, pageSize, initialLoadSize, initialDrillSize);
+		this.segments = segmentList;
 	}
 
 	@Override
 	Object[] load(int offset, int size) throws SQLException {
 		String specId = PartnerManager.instance.getCatalogSpec(anchorId).getSpecId();
-		return new CatalogItemDao().iterateItemsBySyscat(anchorId, specId, clusterId, recursive, gpsLon, gpsLat, offset, size).toArray();
+		return new CatalogItemDao().iterateItemsBySyscat(anchorId, specId, clusterId, buildSegmentMap(), recursive, gpsLon, gpsLat, offset, size).toArray();
 	}
 	
 }

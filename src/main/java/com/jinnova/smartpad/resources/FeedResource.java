@@ -3,6 +3,7 @@ package com.jinnova.smartpad.resources;
 import static com.jinnova.smartpad.partner.IDetailManager.CLUSPRE;
 
 import java.sql.SQLException;
+import java.util.List;
 
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -29,13 +30,14 @@ public class FeedResource {
     
     //@Path("feeds")
     @GET
-    public String getFeed(@QueryParam("u")String uid, @QueryParam("verTarget")String verTarget, @QueryParam("verLatest")String verLatest, 
+    public String getFeed(@QueryParam("u")String uid, @QueryParam("segments") List<String> segments,
+    		@QueryParam("verTarget")String verTarget, @QueryParam("verLatest")String verLatest, 
     		@QueryParam("lon")String lon, @QueryParam("lat")String lat, 
     		@QueryParam("offset")int offset, @QueryParam("size")int size) throws SQLException {
 
 		//return SmartpadCommon.detailManager.drill(null, null, lon, lat);
 		return new DetailManager().drill(uid, IDetailManager.TYPENAME_SYSCAT, 
-				/*PartnerManager.instance.getSystemRootCatalog().getId()*/ CLUSPRE, null, lon, lat);
+				/*PartnerManager.instance.getSystemRootCatalog().getId()*/ CLUSPRE, null, segments, lon, lat);
     }
     
     /**
@@ -51,20 +53,22 @@ public class FeedResource {
      */
 	@GET
 	@Path("{targetType}/{targetId}/drill")
-	public String drill(@QueryParam("u")String uid, @PathParam("targetType") String targetType, @PathParam("targetId") String targetId,
+	public String drill(@QueryParam("u")String uid, @PathParam("targetType") String targetType,
+			@PathParam("targetId") String targetId, @QueryParam("segments") List<String> segments,
 			@QueryParam("lon") String lon, @QueryParam("lat") String lat) throws SQLException {
 
 		//System.out.println("Similarity for branch " + targetId);
-		return new DetailManager().drill(uid, targetType, targetId, null, lon, lat);
+		return new DetailManager().drill(uid, targetType, targetId, null, segments, lon, lat);
 	}
 	
 	@GET
 	@Path("citem/{targetType}/{targetId}/drill")
 	public String drillCitem(@QueryParam("u")String uid, @PathParam("targetType") String targetType, @PathParam("targetId") String targetId,
+			@QueryParam("segments") List<String> segments,
 			@QueryParam("lon") String lon, @QueryParam("lat") String lat) throws SQLException {
 
 		//System.out.println("Similarity for branch " + targetId);
-		return new DetailManager().drill(uid, IDetailManager.TYPENAME_CATITEM, targetId, targetType, lon, lat);
+		return new DetailManager().drill(uid, IDetailManager.TYPENAME_CATITEM, targetId, targetType, segments, lon, lat);
 	}
 	
     @GET
