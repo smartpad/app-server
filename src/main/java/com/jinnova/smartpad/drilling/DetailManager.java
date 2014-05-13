@@ -81,7 +81,7 @@ public class DetailManager implements IDetailManager {
 	public String more(int clusterId, String targetType, String anchorType, String anchorId, String relation,
 			String branchId, String storeId, String catId, String syscatId, String excludeId,
 			boolean recursive, String gpsLon, String gpsLat, int offset, int size, 
-			int layoutOptions, String layoutSyscat) throws SQLException {
+			int layoutOptions, String excludeSyscat) throws SQLException {
 		
 		ActionLoad action = ActionLoad.createLoad(targetType, anchorType, relation);
 		action.clusterId = clusterId;
@@ -92,7 +92,7 @@ public class DetailManager implements IDetailManager {
 		action.pageSize = size;
 		action.recursive = recursive;
 		action.layopts(layoutOptions);
-		action.unshownSyscat(layoutSyscat);
+		action.unshownSyscat(excludeSyscat);
 		if (gpsLon != null) {
 			action.gpsLon = new BigDecimal(gpsLon);
 		}
@@ -103,7 +103,7 @@ public class DetailManager implements IDetailManager {
 		Object[] data = action.load();
 		JsonArray array = new JsonArray();
 		for (int i = 0; i < data.length; i++) {
-			array.add(((Feed) data[i]).generateFeedJson(layoutOptions, layoutSyscat));
+			array.add(((Feed) data[i]).generateFeedJson(layoutOptions, action.layoutParams));
 		}
 		
 		JsonObject json = new JsonObject();
@@ -150,6 +150,7 @@ public class DetailManager implements IDetailManager {
 				Catalog cat = (Catalog) PartnerManager.instance.getSystemCatalog(syscatId);
 				dr.add(cat);
 				dr.layoutOptions = LAYOPT_WITHPARENT | LAYOPT_WITHSEGMENTS;
+				dr.layoutParams.put(Feed.LAYOUT_PARAM_SEGMENTS, segments);
 				
 				dr.add(new ALBranchesBelongToSyscat(syscatId, null, RECURSIVE, 5, 5, 5)
 					.layopts(LAYOPT_WITHSYSCAT).unshownSyscat(syscatId));

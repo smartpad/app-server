@@ -3,6 +3,7 @@ package com.jinnova.smartpad.drilling;
 import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 
 import com.google.gson.JsonArray;
@@ -18,7 +19,8 @@ class DrillResult {
 	
 	//layout options for above feeds
 	int layoutOptions = Feed.LAYOPT_NONE;
-	String layoutSyscat;
+	
+	HashMap<String, Object> layoutParams = new HashMap<>();
 	
 	private final int clusterId;
 	private final BigDecimal lon;
@@ -80,7 +82,7 @@ class DrillResult {
 		}
 		
 		for (Feed f : feeds) {
-			jsonList.add(f.generateFeedJson(layoutOptions, layoutSyscat));
+			jsonList.add(f.generateFeedJson(layoutOptions, layoutParams));
 		}
 		
 		JsonArray ja = new JsonArray();
@@ -140,15 +142,15 @@ class DrillSectionSimple implements DrillSection {
 		}
 		
 		int layOpts = actionLoad.getLayopts();
-		String layoutSyscat = actionLoad.getLayoutSyscat();
+		//String layoutSyscat = actionLoad.getLayoutSyscat();
 		if (ja.length == 1) {
-			return ((Feed) ja[0]).generateFeedJson(layOpts, layoutSyscat);
+			return ((Feed) ja[0]).generateFeedJson(layOpts, actionLoad.layoutParams);
 		}
 		
 		JsonArray array = new JsonArray();
 		int actualCount = Math.min(expectedSize, ja.length);
 		for (int i = 0; i < actualCount; i++) {
-			array.add(((Feed) ja[i]).generateFeedJson(layOpts, layoutSyscat));
+			array.add(((Feed) ja[i]).generateFeedJson(layOpts, actionLoad.layoutParams));
 		}
 		
 		JsonObject json = new JsonObject();
@@ -176,9 +178,9 @@ class DrillSectionSimple implements DrillSection {
 		boolean copied = false;
 		int actualCount = Math.min(expectedSize, ja.length);
 		int layOpts = actionLoad.getLayopts();
-		String layoutSyscat = actionLoad.getLayoutSyscat();
+		//String layoutSyscat = actionLoad.getLayoutSyscat();
 		for (int i = 0; i < actualCount; i++) {
-			jsonList.add(((Feed) ja[i]).generateFeedJson(layOpts, layoutSyscat));
+			jsonList.add(((Feed) ja[i]).generateFeedJson(layOpts, actionLoad.layoutParams));
 			copied = true;
 		}
 		actionLoad.setOffset(actualCount);

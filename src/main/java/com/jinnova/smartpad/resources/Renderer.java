@@ -26,9 +26,12 @@ class RendererSyscat extends Renderer {
 		
 		if (FIELD_SEGMENT_VALUE.equals(key)) {
 			//String segmentFieldId = feedJson.get(FIELD_SEGMENT).getAsJsonObject().get(FIELD_SEGMENT_FIELDID).getAsString();
-			return "<a href='" + RenderLinkJob.HOST + TYPENAME_SYSCAT + "/" + feedJson.get(FIELD_ID).getAsString() + "/drill" + 
+			/*return "<a href='" + RenderLinkJob.HOST + TYPENAME_SYSCAT + "/" + feedJson.get(FIELD_ID).getAsString() + "/drill" + 
 					"?segments=" + json.get(FIELD_SEGMENT_FIELDID).getAsString() + ":" +
-					json.get(FIELD_SEGMENT_VALUEID).getAsString() + "'>" + value + "</a>";
+					json.get(FIELD_SEGMENT_VALUEID).getAsString() + "'>" + value + "</a>";*/
+			return "<a href='/w" + json.get(FIELD_SEGMENT_LINK).getAsString() + "'>" + value + "</a>";
+		} else if (FIELD_SEGMENT_LINK.equals(key)) {
+			return "";
 		}
 		return value;
 	}

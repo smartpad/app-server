@@ -71,7 +71,8 @@ abstract class ActionLoad {
 	
 	private int layoutOptions = Feed.LAYOPT_NONE;
 	
-	private String layoutSyscat;
+	//private String layoutSyscat;
+	HashMap<String, Object> layoutParams = new HashMap<>();
 	
 	static void initialize() {
 		actionClasses = new HashMap<String, Class<? extends ActionLoad>>();
@@ -124,12 +125,18 @@ abstract class ActionLoad {
 		return this;
 	}
 	
-	String getLayoutSyscat() {
+	/*String getLayoutSyscat() {
 		return this.layoutSyscat;
-	}
+	}*/
 	
 	ActionLoad unshownSyscat(String layoutSyscat) {
-		this.layoutSyscat = layoutSyscat;
+		//this.layoutSyscat = layoutSyscat;
+		layoutParams.put(Feed.LAYOUT_PARAM_SYSCAT_EXCLUDE, layoutSyscat);
+		return this;
+	}
+	
+	ActionLoad layoutParam(String key, String value) {
+		layoutParams.put(key, value);
 		return this;
 	}
 	
@@ -194,9 +201,9 @@ abstract class ActionLoad {
 		}
 		buffer.append("&recur=" + recursive);
 		buffer.append("&layopts=" + layoutOptions);
-		if (layoutSyscat != null) {
+		/*if (layoutSyscat != null) {
 			buffer.append("&laysc=" + layoutSyscat);
-		}
+		}*/
 		return buffer.toString();
 	}
 	
