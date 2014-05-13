@@ -332,7 +332,7 @@ class ALItemBelongToCatalog extends ActionLoad {
 	@Override
 	Object[] load(int offset, int size) throws SQLException {
 		String specId = PartnerManager.instance.getCatalogSpec(syscatId).getSpecId();
-		return new CatalogItemDao().iterateItemsByCatalog(anchorId, specId, excludeId, recursive, gpsLon, gpsLat, offset, size).toArray();
+		return new CatalogItemDao().iterateItems(anchorId, specId, excludeId, null, false, null, recursive, gpsLon, gpsLat, offset, size).toArray();
 	}
 	
 }
@@ -352,7 +352,7 @@ class ALItemBelongToSyscat extends ActionLoad {
 	@Override
 	Object[] load(int offset, int size) throws SQLException {
 		String specId = PartnerManager.instance.getCatalogSpec(anchorId).getSpecId();
-		return new CatalogItemDao().iterateItemsBySyscat(anchorId, specId, clusterId, buildSegmentMap(), recursive, gpsLon, gpsLat, offset, size).toArray();
+		return new CatalogItemDao().iterateItems(anchorId, specId, null, buildSegmentMap(), true, clusterId, recursive, gpsLon, gpsLat, offset, size).toArray();
 	}
 	
 }
