@@ -286,7 +286,7 @@ public class DetailManager implements IDetailManager {
 				createBranchAlerts(dr, catItem.getBranchId());
 				
 				dr.add(catItem);
-				dr.layoutOptions = LAYOPT_WITHBRANCH | LAYOPT_WITHSYSCAT | LAYOPT_WITHCAT;
+				dr.layoutOptions = LAYOPT_WITHBRANCH | LAYOPT_WITHSYSCAT | LAYOPT_WITHCAT | LAYOPT_WITHDETAILS;
 				
 				dr.add(new ALItemBelongToCatalog(catItem.getCatalogId(), catItem.getSyscatId(), targetId, RECURSIVE, 10, 10, 10).layopts(LAYOPT_WITHCAT)
 						.unshownSyscat(catItem.getCatalogId()));

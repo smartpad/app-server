@@ -13,6 +13,7 @@ import com.jinnova.smartpad.db.CatalogDao;
 import com.jinnova.smartpad.db.CatalogItemDao;
 import com.jinnova.smartpad.db.OperationDao;
 import com.jinnova.smartpad.db.PromotionDao;
+import com.jinnova.smartpad.partner.ICatalogField;
 import com.jinnova.smartpad.partner.PartnerManager;
 
 abstract class ActionLoad {
@@ -222,7 +223,7 @@ abstract class ActionLoad {
 		}
 		HashMap<String, LinkedList<String>> segmentMap = new HashMap<>();
 		for (String one : segments) {
-			int index = one.indexOf(':');
+			int index = one.indexOf(ICatalogField.SEGMENT_PARAM_SEP);
 			if (index + 1 >= one.length()) {
 				continue;
 			}

@@ -5,7 +5,6 @@ import static com.jinnova.smartpad.partner.IDetailManager.*;
 import java.util.HashMap;
 
 import com.google.gson.JsonObject;
-import com.jinnova.smartpad.partner.CatalogField;
 import com.jinnova.smartpad.partner.IDetailManager;
 
 abstract class Renderer {
@@ -25,10 +24,11 @@ class RendererSyscat extends Renderer {
 	@Override
 	String html(JsonObject feedJson, JsonObject json, String key, String value) {
 		
-		if (CatalogField.ATT_GROUPING_VALUE.equals(key)) {
+		if (FIELD_SEGMENT_VALUE.equals(key)) {
+			//String segmentFieldId = feedJson.get(FIELD_SEGMENT).getAsJsonObject().get(FIELD_SEGMENT_FIELDID).getAsString();
 			return "<a href='" + RenderLinkJob.HOST + TYPENAME_SYSCAT + "/" + feedJson.get(FIELD_ID).getAsString() + "/drill" + 
-					"?segments=" + json.get(CatalogField.ATT_GROUPING_FIELD).getAsString() + ":" +
-					json.get(CatalogField.ATT_GROUPING_VALUEID).getAsString() + "'>" + value + "</a>";
+					"?segments=" + json.get(FIELD_SEGMENT_FIELDID).getAsString() + ":" +
+					json.get(FIELD_SEGMENT_VALUEID).getAsString() + "'>" + value + "</a>";
 		}
 		return value;
 	}
