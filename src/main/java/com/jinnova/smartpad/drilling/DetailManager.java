@@ -63,12 +63,15 @@ public class DetailManager implements IDetailManager {
     		clusterId = 1;
     	}
     	DrillResult dr = drillers[targetTypeNumber].drill(clusterId, targetId, targetSyscat, segments, lon, lat/*, page, size*/);
-    	JsonObject json = new JsonObject();
-    	dr.writeJson(json);
-    	json.addProperty(FIELD_VERSION, "a");
+    	JsonObject dataJson = new JsonObject();
+    	dr.writeJson(dataJson);
+    	dataJson.addProperty(FIELD_VERSION, "a");
     	//json.addProperty("page", page);
     	//json.addProperty("size", size);
-    	cached = json.toString();
+    	
+    	JsonObject resultJson = new JsonObject();
+    	resultJson.add(VERSIONING_TARGET, dataJson);
+    	cached = resultJson.toString();
     	CacheDao.put(cached, targetTypeNumber, targetId, gpsZone/*, page*/);
     	return cached;
     }

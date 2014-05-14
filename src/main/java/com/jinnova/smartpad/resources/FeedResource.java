@@ -17,7 +17,7 @@ import com.jinnova.smartpad.Feed;
 import com.jinnova.smartpad.drilling.DetailManager;
 import com.jinnova.smartpad.partner.IDetailManager;
 
-@Path("/")
+@Path("/" + IDetailManager.REST_FEEDS)
 @Produces(MediaType.APPLICATION_JSON)
 public class FeedResource {
 	

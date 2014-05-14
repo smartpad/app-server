@@ -15,7 +15,7 @@ import com.jinnova.smartpad.Feed;
 import com.jinnova.smartpad.drilling.DetailManager;
 import com.jinnova.smartpad.partner.IDetailManager;
 
-@Path("/w")
+@Path("/" + IDetailManager.REST_FEEDS + "/w")
 @Produces(MediaType.TEXT_HTML + ";charset=utf-8")
 public class FeedResourceWeb extends FeedResource {
 

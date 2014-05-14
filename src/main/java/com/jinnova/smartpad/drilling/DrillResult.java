@@ -155,6 +155,7 @@ class DrillSectionSimple implements DrillSection {
 		
 		JsonObject json = new JsonObject();
 		json.addProperty(IDetailManager.FIELD_TYPE, sectionType);
+		json.addProperty(IDetailManager.FIELD_TYPENUM, IDetailManager.TYPE_COMPOUND);
 		json.add(IDetailManager.FIELD_ARRAY, array);
 		if (ja.length >= expectedSize && actionLoad != null) {
 			actionLoad.setOffset(actualCount);
@@ -251,6 +252,7 @@ class DrillSectionTwin implements DrillSection {
 		
 		JsonObject json = new JsonObject();
 		json.addProperty(IDetailManager.FIELD_TYPE, sectionType);
+		json.addProperty(IDetailManager.FIELD_TYPENUM, IDetailManager.TYPE_COMPOUND);
 		
 		JsonArray ja = new JsonArray();
 		for (JsonObject o : jsonList) {
