@@ -149,7 +149,7 @@ public class DetailManager implements IDetailManager {
 				
 				Catalog cat = (Catalog) PartnerManager.instance.getSystemCatalog(syscatId);
 				dr.add(cat);
-				dr.layoutOptions = LAYOPT_WITHPARENT | LAYOPT_WITHSEGMENTS;
+				dr.layoutOptions = LAYOPT_WITHPARENT | LAYOPT_WITHSEGMENTS | LAYOPT_WITHSEGMENTS_REMOVER;
 				dr.layoutParams.put(Feed.LAYOUT_PARAM_SEGMENTS, segments);
 				
 				dr.add(new ALBranchesBelongToSyscat(syscatId, null, RECURSIVE, 5, 5, 5)
