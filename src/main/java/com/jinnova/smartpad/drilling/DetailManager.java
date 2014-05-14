@@ -79,7 +79,7 @@ public class DetailManager implements IDetailManager {
 
 	@Override
 	public String more(int clusterId, String targetType, String anchorType, String anchorId, String relation,
-			String branchId, String storeId, String catId, String syscatId, String excludeId,
+			String branchId, String storeId, String catId, String syscatId, String excludeId, List<String> segments,
 			boolean recursive, String gpsLon, String gpsLat, int offset, int size, 
 			int layoutOptions, String excludeSyscat) throws SQLException {
 		
@@ -91,6 +91,8 @@ public class DetailManager implements IDetailManager {
 		action.offset = offset;
 		action.pageSize = size;
 		action.recursive = recursive;
+		action.segments = segments;
+		action.layoutParams.put(Feed.LAYOUT_PARAM_SEGMENTS, segments);
 		action.layopts(layoutOptions);
 		action.unshownSyscat(excludeSyscat);
 		if (gpsLon != null) {

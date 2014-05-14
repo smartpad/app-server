@@ -85,6 +85,7 @@ public class FeedResource {
     		@QueryParam("catId") String catId,
     		@QueryParam("syscatId") String syscatId,
     		@QueryParam("excludeId") String excludeId,
+			@QueryParam("segments") List<String> segments,
     		
     		@QueryParam("recur")boolean recursize, @QueryParam("lon")String lon, @QueryParam("lat")String lat, 
     		@QueryParam("offset")int offset, @QueryParam("size")int size, 
@@ -92,7 +93,7 @@ public class FeedResource {
     		@QueryParam("laysc") String layoutSyscat) throws SQLException {
 
     	return new DetailManager().more(clusterId, targetType, anchorType, anchorId, relation, 
-    			branchId, storeId, catId, syscatId, excludeId, recursize, lon, lat, offset, size, layoutOptions, layoutSyscat);
+    			branchId, storeId, catId, syscatId, excludeId, segments, recursize, lon, lat, offset, size, layoutOptions, layoutSyscat);
     }
     
 }
