@@ -2,12 +2,10 @@ package com.jinnova.smartpad;
 
 import java.sql.SQLException;
 
-import com.jinnova.smartpad.drilling.DetailManager;
 import com.jinnova.smartpad.health.TemplateHealthCheck;
 import com.jinnova.smartpad.partner.SmartpadCommon;
 import com.jinnova.smartpad.resources.ActivityResource;
 import com.jinnova.smartpad.resources.FeedResource;
-import com.jinnova.smartpad.resources.FeedResourceWeb;
 import com.yammer.dropwizard.Service;
 import com.yammer.dropwizard.config.Bootstrap;
 import com.yammer.dropwizard.config.Environment;
@@ -24,19 +22,19 @@ public class SmartPadAppService extends Service<SmartPadConfiguration> {
     }
 
     @Override
-    public void run(SmartPadConfiguration configuration, Environment environment) {
+    public void run(SmartPadConfiguration configuration, Environment environment) throws SQLException {
+        SmartpadCommon.initialize("localhost", null, "smartpad_drill", "root", "");
     	final String templateHello = configuration.getTemplateHello();
         final String defaultSearchNoFound = configuration.getDefaultSearchNoFound();
-        environment.addResource(new FeedResource(defaultSearchNoFound));
-        environment.addResource(new FeedResourceWeb(defaultSearchNoFound));
+        environment.addResource(new FeedResource(defaultSearchNoFound, "smartpad://"));
+        //environment.addResource(new FeedResourceWeb(defaultSearchNoFound));
         environment.addResource(new ActivityResource());
         environment.addHealthCheck(new TemplateHealthCheck(templateHello));
-        SmartpadCommon.initialize("localhost", null, "smartpad_drill", "root", "");
-        try {
+        /*try {
 			DetailManager.initialize();
 		} catch (SQLException e) {
 			throw new RuntimeException(e);
-		}
+		}*/
         /*try {
 			DBQuery.initialize("root", "", "jdbc:mysql://localhost/smartpad");
 		} catch (SQLException e) {

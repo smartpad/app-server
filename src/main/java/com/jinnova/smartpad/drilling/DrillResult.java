@@ -25,18 +25,21 @@ class DrillResult {
 	private final int clusterId;
 	private final BigDecimal lon;
 	private final BigDecimal lat;
+	
+	private final String linkPrefix;
 		
-	public DrillResult(int clusterId, BigDecimal lon, BigDecimal lat) {
+	public DrillResult(int clusterId, BigDecimal lon, BigDecimal lat, String linkPrefix) {
 		this.clusterId = clusterId;
 		this.lon = lon;
 		this.lat = lat;
+		this.linkPrefix = linkPrefix;
 	}
 	
 	void add(ActionLoad actionLoad) throws SQLException {
 		actionLoad.clusterId = this.clusterId;
 		actionLoad.gpsLon = this.lon;
 		actionLoad.gpsLat = this.lat;
-		allSections.add(new DrillSectionSimple(actionLoad));
+		allSections.add(new DrillSectionSimple(actionLoad, linkPrefix));
 	}
 	
 	void add(String sectionType, ActionLoad load1, ActionLoad load2) throws SQLException {
@@ -47,7 +50,7 @@ class DrillResult {
 		load2.gpsLon = this.lon;
 		load2.gpsLat = this.lat;
 		allSections.add(new DrillSectionTwin(sectionType, 
-				new DrillSectionSimple(load1), new DrillSectionSimple(load2)));
+				new DrillSectionSimple(load1, linkPrefix), new DrillSectionSimple(load2, linkPrefix)));
 	}
 	
 	void add(Feed f) {
@@ -81,6 +84,7 @@ class DrillResult {
 			}
 		}
 		
+		layoutParams.put(Feed.LAYOUT_PARAM_LINKPREFIX, linkPrefix);
 		for (Feed f : feeds) {
 			jsonList.add(f.generateFeedJson(layoutOptions, layoutParams));
 		}
@@ -112,19 +116,23 @@ class DrillSectionSimple implements DrillSection {
 	
 	private boolean forcedFlatten = false;
 	
-	DrillSectionSimple(String sectionType, Object[] ja, int expectedSize, ActionLoad load) {
+	private final String linkPrefix;
+	
+	DrillSectionSimple(String sectionType, Object[] ja, int expectedSize, ActionLoad load, String linkPrefix) {
 		//this.sectionType = sectionType;
 		this.ja = ja;
 		this.expectedSize = expectedSize;
 		this.actionLoad = load;
+		this.linkPrefix = linkPrefix;
 	}
 	
-	DrillSectionSimple(ActionLoad load) throws SQLException {
+	DrillSectionSimple(ActionLoad load, String linkPrefix) throws SQLException {
 		//this.sectionType = load.targetType;
 		//this.sectionType = IDetailManager.TYPENAME_COMPOUND;
 		this.ja = load.loadFirstEntries();
 		this.expectedSize = load.getInitialDrillSize();
 		this.actionLoad = load;
+		this.linkPrefix = linkPrefix;
 	}
 	
 	DrillSectionSimple forceFlatten() {
@@ -145,6 +153,7 @@ class DrillSectionSimple implements DrillSection {
 		
 		int layOpts = actionLoad.getLayopts();
 		//String layoutSyscat = actionLoad.getLayoutSyscat();
+		actionLoad.layoutParams.put(Feed.LAYOUT_PARAM_LINKPREFIX, linkPrefix);
 		if (ja.length == 1) {
 			return ((Feed) ja[0]).generateFeedJson(layOpts, actionLoad.layoutParams);
 		}
@@ -183,6 +192,7 @@ class DrillSectionSimple implements DrillSection {
 		int actualCount = Math.min(expectedSize, ja.length);
 		int layOpts = actionLoad.getLayopts();
 		//String layoutSyscat = actionLoad.getLayoutSyscat();
+		actionLoad.layoutParams.put(Feed.LAYOUT_PARAM_LINKPREFIX, linkPrefix);
 		for (int i = 0; i < actualCount; i++) {
 			jsonList.add(((Feed) ja[i]).generateFeedJson(layOpts, actionLoad.layoutParams));
 			copied = true;

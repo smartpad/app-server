@@ -34,6 +34,13 @@ public class DetailManager implements IDetailManager {
 	private static DetailDriller[] drillers = new DetailDriller[TYPE_COUNT];
 	
 	private static HashMap<String, Integer> clusterMap = new HashMap<>();
+	
+	private final String linkPrefix;
+	
+	public DetailManager(String linkPrefix) throws SQLException {
+		this.linkPrefix = linkPrefix;
+		initialize();
+	}
     
 	@Override
     public String drill(String uid, String targetType, String targetId, String targetSyscat, List<String> segments, 
@@ -106,6 +113,7 @@ public class DetailManager implements IDetailManager {
 		}
 		
 		Object[] data = action.load();
+		action.layoutParams.put(LAYOUT_PARAM_LINKPREFIX, linkPrefix);
 		JsonArray array = new JsonArray();
 		for (int i = 0; i < data.length; i++) {
 			array.add(((Feed) data[i]).generateFeedJson(layoutOptions, action.layoutParams));
@@ -118,10 +126,10 @@ public class DetailManager implements IDetailManager {
 		return json.toString();
 	}
 	
-	private static DrillResult createDefaultDrills(int clusterId, BigDecimal lon, BigDecimal lat) {
+	private DrillResult createDefaultDrills(int clusterId, BigDecimal lon, BigDecimal lat) {
 		
 		//order statuses
-		DrillResult dr = new DrillResult(clusterId, lon, lat);
+		DrillResult dr = new DrillResult(clusterId, lon, lat, linkPrefix);
 		
 		//promotion alerts for a specific syscat
 		
@@ -138,7 +146,7 @@ public class DetailManager implements IDetailManager {
 		//promotion alerts for a specific syscat
 	}
 	
-	public static void initialize() throws SQLException {
+	public void initialize() throws SQLException {
 		
 		ActionLoad.initialize();
 		loadAllConsumers();

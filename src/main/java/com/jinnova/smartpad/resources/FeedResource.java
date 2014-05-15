@@ -21,11 +21,16 @@ import com.jinnova.smartpad.partner.IDetailManager;
 @Produces(MediaType.APPLICATION_JSON)
 public class FeedResource {
 	
+	//String linkPrefix = "smartpad://";
+	
+	private DetailManager detailManager;
+	
     @SuppressWarnings("unused")
 	private final String defaultSearchNoFound;
 
-    public FeedResource(String defaultSearchNoFound) {
+    public FeedResource(String defaultSearchNoFound, String linkPrefix) throws SQLException {
         this.defaultSearchNoFound = defaultSearchNoFound;
+        detailManager = new DetailManager(linkPrefix);
     }
     
     //@Path("feeds")
@@ -36,7 +41,7 @@ public class FeedResource {
     		@QueryParam("offset")int offset, @QueryParam("size")int size) throws SQLException {
 
 		//return SmartpadCommon.detailManager.drill(null, null, lon, lat);
-		return new DetailManager().drill(uid, IDetailManager.TYPENAME_SYSCAT, 
+		return detailManager.drill(uid, IDetailManager.TYPENAME_SYSCAT, 
 				/*PartnerManager.instance.getSystemRootCatalog().getId()*/ CLUSPRE, null, segments, lon, lat);
     }
     
@@ -58,7 +63,7 @@ public class FeedResource {
 			@QueryParam("lon") String lon, @QueryParam("lat") String lat) throws SQLException {
 
 		//System.out.println("Similarity for branch " + targetId);
-		return new DetailManager().drill(uid, targetType, targetId, null, segments, lon, lat);
+		return detailManager.drill(uid, targetType, targetId, null, segments, lon, lat);
 	}
 	
 	@GET
@@ -68,7 +73,7 @@ public class FeedResource {
 			@QueryParam("lon") String lon, @QueryParam("lat") String lat) throws SQLException {
 
 		//System.out.println("Similarity for branch " + targetId);
-		return new DetailManager().drill(uid, IDetailManager.TYPENAME_CATITEM, targetId, targetType, segments, lon, lat);
+		return detailManager.drill(uid, IDetailManager.TYPENAME_CATITEM, targetId, targetType, segments, lon, lat);
 	}
 	
     @GET
@@ -92,7 +97,7 @@ public class FeedResource {
     		@QueryParam("layopts") @DefaultValue("" + Feed.LAYOPT_NONE) int layoutOptions,
     		@QueryParam("laysc") String layoutSyscat) throws SQLException {
 
-    	return new DetailManager().more(clusterId, targetType, anchorType, anchorId, relation, 
+    	return detailManager.more(clusterId, targetType, anchorType, anchorId, relation, 
     			branchId, storeId, catId, syscatId, excludeId, segments, recursize, lon, lat, offset, size, layoutOptions, layoutSyscat);
     }
     

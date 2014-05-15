@@ -12,15 +12,14 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import com.jinnova.smartpad.Feed;
-import com.jinnova.smartpad.drilling.DetailManager;
 import com.jinnova.smartpad.partner.IDetailManager;
 
 @Path("/" + IDetailManager.REST_FEEDS + "/w")
 @Produces(MediaType.TEXT_HTML + ";charset=utf-8")
 public class FeedResourceWeb extends FeedResource {
 
-    public FeedResourceWeb(String defaultSearchNoFound) {
-    	super(defaultSearchNoFound);
+    public FeedResourceWeb(String defaultSearchNoFound) throws SQLException {
+    	super(defaultSearchNoFound, "/w");
     }
     
     //@Path("feeds")
@@ -55,7 +54,7 @@ public class FeedResourceWeb extends FeedResource {
 			@QueryParam("segments") List<String> segments, @QueryParam("lon") String lon, @QueryParam("lat") String lat) throws SQLException {
 
 		//System.out.println("Similarity for branch " + targetId);
-		String s = new DetailManager().drill(uid, IDetailManager.TYPENAME_CATITEM, targetId, targetType, segments, lon, lat);
+		String s = super.drillCitem(uid, targetType, targetId, segments, lon, lat);
 		return new RenderLinkJob(s).render();
 	}
 	

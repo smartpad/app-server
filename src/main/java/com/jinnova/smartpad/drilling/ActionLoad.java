@@ -75,6 +75,9 @@ abstract class ActionLoad {
 	HashMap<String, Object> layoutParams = new HashMap<>();
 	
 	static void initialize() {
+		if (actionClasses != null) {
+			return;
+		}
 		actionClasses = new HashMap<String, Class<? extends ActionLoad>>();
 		register(new ALBranchesBelongToSyscat());
 		register(new ALCatalogsBelongToCatalog());
