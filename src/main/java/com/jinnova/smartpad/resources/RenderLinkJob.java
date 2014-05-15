@@ -14,7 +14,7 @@ class RenderLinkJob {
 	
 	private String content;
 	
-	static final String HOST = "http://localhost:9090/w/";
+	static final String HOST = "http://localhost:9090/feeds/w/";
 
 	RenderLinkJob(String s) {
 		this.content = s;
