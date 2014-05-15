@@ -102,7 +102,8 @@ interface DrillSection {
 
 class DrillSectionSimple implements DrillSection {
 	
-	private String sectionType;
+	//private String sectionType;
+	
 	Object[] ja;
 	int expectedSize;
 	//private int layoutOptions = Feed.LAYOPT_NONE;
@@ -112,14 +113,15 @@ class DrillSectionSimple implements DrillSection {
 	private boolean forcedFlatten = false;
 	
 	DrillSectionSimple(String sectionType, Object[] ja, int expectedSize, ActionLoad load) {
-		this.sectionType = sectionType;
+		//this.sectionType = sectionType;
 		this.ja = ja;
 		this.expectedSize = expectedSize;
 		this.actionLoad = load;
 	}
 	
 	DrillSectionSimple(ActionLoad load) throws SQLException {
-		this.sectionType = load.targetType;
+		//this.sectionType = load.targetType;
+		//this.sectionType = IDetailManager.TYPENAME_COMPOUND;
 		this.ja = load.loadFirstEntries();
 		this.expectedSize = load.getInitialDrillSize();
 		this.actionLoad = load;
@@ -154,7 +156,8 @@ class DrillSectionSimple implements DrillSection {
 		}
 		
 		JsonObject json = new JsonObject();
-		json.addProperty(IDetailManager.FIELD_TYPE, sectionType);
+		//json.addProperty(IDetailManager.FIELD_TYPE, sectionType);
+		json.addProperty(IDetailManager.FIELD_TYPE, IDetailManager.TYPENAME_COMPOUND);
 		json.addProperty(IDetailManager.FIELD_TYPENUM, IDetailManager.TYPE_COMPOUND);
 		json.add(IDetailManager.FIELD_ARRAY, array);
 		if (ja.length >= expectedSize && actionLoad != null) {
