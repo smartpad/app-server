@@ -37,7 +37,7 @@ public class FeedResourceWeb extends FeedResource {
     }
     
 	@GET
-	@Path("{targetType}/{targetId}/drill")
+	@Path("{targetType}/{targetId}/" + IDetailManager.REST_DRILL)
 	@Override
 	public String drill(@QueryParam("u")String uid, @PathParam("targetType") String targetType,
 			@PathParam("targetId") String targetId, @QueryParam("segments") List<String> segments,
@@ -49,7 +49,7 @@ public class FeedResourceWeb extends FeedResource {
 	}
 	
 	@GET
-	@Path("citem/{targetType}/{targetId}/drill")
+	@Path("citem/{targetType}/{targetId}/" + IDetailManager.REST_DRILL)
 	@Override
 	public String drillCitem(@QueryParam("u")String uid, @PathParam("targetType") String targetType, @PathParam("targetId") String targetId,
 			@QueryParam("segments") List<String> segments, @QueryParam("lon") String lon, @QueryParam("lat") String lat) throws SQLException {

@@ -52,7 +52,7 @@ public class FeedResource {
      *
      */
 	@GET
-	@Path("{targetType}/{targetId}/drill")
+	@Path("{targetType}/{targetId}/" + IDetailManager.REST_DRILL)
 	public String drill(@QueryParam("u")String uid, @PathParam("targetType") String targetType,
 			@PathParam("targetId") String targetId, @QueryParam("segments") List<String> segments,
 			@QueryParam("lon") String lon, @QueryParam("lat") String lat) throws SQLException {
@@ -62,7 +62,7 @@ public class FeedResource {
 	}
 	
 	@GET
-	@Path("citem/{targetType}/{targetId}/drill")
+	@Path("citem/{targetType}/{targetId}/" + IDetailManager.REST_DRILL)
 	public String drillCitem(@QueryParam("u")String uid, @PathParam("targetType") String targetType, @PathParam("targetId") String targetId,
 			@QueryParam("segments") List<String> segments,
 			@QueryParam("lon") String lon, @QueryParam("lat") String lat) throws SQLException {
