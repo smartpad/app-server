@@ -14,12 +14,12 @@ import javax.ws.rs.core.MediaType;
 import com.jinnova.smartpad.Feed;
 import com.jinnova.smartpad.partner.IDetailManager;
 
-@Path("/" + IDetailManager.REST_FEEDS + "/w")
+@Path("/w/" + IDetailManager.REST_FEEDS)
 @Produces(MediaType.TEXT_HTML + ";charset=utf-8")
 public class FeedResourceWeb extends FeedResource {
 
     public FeedResourceWeb(String defaultSearchNoFound) throws SQLException {
-    	super(defaultSearchNoFound, "/" + IDetailManager.REST_FEEDS + "/w");
+    	super(defaultSearchNoFound, "/w/" + IDetailManager.REST_FEEDS);
     }
     
     //@Path("feeds")

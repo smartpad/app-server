@@ -165,10 +165,12 @@ public class DetailManager implements IDetailManager {
 				DrillResult dr = createDefaultDrills(clusterId, lon, lat);
 				createSyscatAlerts(dr, syscatId);
 				
-				Catalog cat = (Catalog) PartnerManager.instance.getSystemCatalog(syscatId);
-				dr.add(cat);
-				dr.layoutOptions = LAYOPT_WITHPARENT | LAYOPT_WITHSEGMENTS | LAYOPT_WITHSEGMENTS_REMOVER;
-				dr.layoutParams.put(Feed.LAYOUT_PARAM_SEGMENTS, segments);
+				if (!IDetailManager.SYSTEM_CAT_ALL.equals(syscatId)) {
+					Catalog cat = (Catalog) PartnerManager.instance.getSystemCatalog(syscatId);
+					dr.add(cat);
+					dr.layoutOptions = LAYOPT_WITHPARENT | LAYOPT_WITHSEGMENTS | LAYOPT_WITHSEGMENTS_REMOVER;
+					dr.layoutParams.put(Feed.LAYOUT_PARAM_SEGMENTS, segments);
+				}
 				
 				dr.add(new ALBranchesBelongToSyscat(syscatId, null, RECURSIVE, 5, 5, 5)
 					.layopts(LAYOPT_WITHSYSCAT).unshownSyscat(syscatId));
