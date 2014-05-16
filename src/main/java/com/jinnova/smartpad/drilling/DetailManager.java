@@ -119,11 +119,16 @@ public class DetailManager implements IDetailManager {
 			array.add(((Feed) data[i]).generateFeedJson(layoutOptions, action.layoutParams));
 		}
 		
-		JsonObject json = new JsonObject();
-		json.add(FIELD_ARRAY, array);
-		json.addProperty(FIELD_ACTION_LOADNEXT, linkPrefix + "/" + action.generateNextLoadUrl());
+		JsonObject dataJson = new JsonObject();
+		dataJson.add(FIELD_ARRAY, array);
+		String nextUrl = action.generateNextLoadUrl();
+		if (nextUrl != null) {
+			dataJson.addProperty(FIELD_ACTION_LOADNEXT, linkPrefix + "/" + nextUrl);
+		}
 		//System.out.println("next load: " + actionLoad.generateNextLoadUrl());
-		return json.toString();
+    	JsonObject resultJson = new JsonObject();
+    	resultJson.add(VERSIONING_TARGET, dataJson);
+		return resultJson.toString();
 	}
 	
 	private DrillResult createDefaultDrills(int clusterId, BigDecimal lon, BigDecimal lat) {

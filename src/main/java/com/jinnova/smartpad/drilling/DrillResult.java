@@ -67,11 +67,15 @@ class DrillResult {
 				flatten = oneSection.copyTo(jsonList);
 				if (flatten) {
 					if (oneSection instanceof DrillSectionSimple) {
-						resultJson.addProperty(IDetailManager.FIELD_ACTION_LOADNEXT, 
-								linkPrefix + "/" + ((DrillSectionSimple) oneSection).actionLoad.generateNextLoadUrl());
+						String nextUrl = ((DrillSectionSimple) oneSection).actionLoad.generateNextLoadUrl();
+						if (nextUrl != null) {
+							resultJson.addProperty(IDetailManager.FIELD_ACTION_LOADNEXT, linkPrefix + "/" + nextUrl);
+						}
 					} else {
-						resultJson.addProperty(IDetailManager.FIELD_ACTION_LOADNEXT, 
-								linkPrefix + "/" + ((DrillSectionTwin) oneSection).flatenSection.actionLoad.generateNextLoadUrl());
+						String nextUrl = ((DrillSectionTwin) oneSection).flatenSection.actionLoad.generateNextLoadUrl();
+						if (nextUrl != null) {
+							resultJson.addProperty(IDetailManager.FIELD_ACTION_LOADNEXT, linkPrefix + "/" + nextUrl);
+						}
 					}
 				}
 			} else if (oneSection instanceof DrillSectionSimple && ((DrillSectionSimple) oneSection).isForcedFlatten()) {
