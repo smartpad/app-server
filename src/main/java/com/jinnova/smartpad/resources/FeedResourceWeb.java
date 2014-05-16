@@ -19,7 +19,7 @@ import com.jinnova.smartpad.partner.IDetailManager;
 public class FeedResourceWeb extends FeedResource {
 
     public FeedResourceWeb(String defaultSearchNoFound) throws SQLException {
-    	super(defaultSearchNoFound, "/w");
+    	super(defaultSearchNoFound, "/" + IDetailManager.REST_FEEDS + "/w");
     }
     
     //@Path("feeds")

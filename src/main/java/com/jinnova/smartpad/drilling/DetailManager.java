@@ -31,7 +31,7 @@ public class DetailManager implements IDetailManager {
 	private static final boolean RECURSIVE = true;
 	private static final boolean DIRECT = false;
 	
-	private static DetailDriller[] drillers = new DetailDriller[TYPE_COUNT];
+	private DetailDriller[] drillers = new DetailDriller[TYPE_COUNT];
 	
 	private static HashMap<String, Integer> clusterMap = new HashMap<>();
 	
@@ -121,7 +121,7 @@ public class DetailManager implements IDetailManager {
 		
 		JsonObject json = new JsonObject();
 		json.add(FIELD_ARRAY, array);
-		json.addProperty(FIELD_ACTION_LOADNEXT, action.generateNextLoadUrl());
+		json.addProperty(FIELD_ACTION_LOADNEXT, linkPrefix + "/" + action.generateNextLoadUrl());
 		//System.out.println("next load: " + actionLoad.generateNextLoadUrl());
 		return json.toString();
 	}

@@ -68,10 +68,10 @@ class DrillResult {
 				if (flatten) {
 					if (oneSection instanceof DrillSectionSimple) {
 						resultJson.addProperty(IDetailManager.FIELD_ACTION_LOADNEXT, 
-								((DrillSectionSimple) oneSection).actionLoad.generateNextLoadUrl());
+								linkPrefix + "/" + ((DrillSectionSimple) oneSection).actionLoad.generateNextLoadUrl());
 					} else {
 						resultJson.addProperty(IDetailManager.FIELD_ACTION_LOADNEXT, 
-								((DrillSectionTwin) oneSection).flatenSection.actionLoad.generateNextLoadUrl());
+								linkPrefix + "/" + ((DrillSectionTwin) oneSection).flatenSection.actionLoad.generateNextLoadUrl());
 					}
 				}
 			} else if (oneSection instanceof DrillSectionSimple && ((DrillSectionSimple) oneSection).isForcedFlatten()) {
@@ -171,7 +171,7 @@ class DrillSectionSimple implements DrillSection {
 		json.add(IDetailManager.FIELD_ARRAY, array);
 		if (ja.length >= expectedSize && actionLoad != null) {
 			actionLoad.setOffset(actualCount);
-			json.addProperty(IDetailManager.FIELD_ACTION_LOADNEXT, actionLoad.generateNextLoadUrl());
+			json.addProperty(IDetailManager.FIELD_ACTION_LOADNEXT, linkPrefix + "/" + actionLoad.generateNextLoadUrl());
 		}
 		System.out.println("next load: " + actionLoad.generateNextLoadUrl());
 		return json;
