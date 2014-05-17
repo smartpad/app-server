@@ -313,13 +313,19 @@ public class DetailManager implements IDetailManager {
 				dr.layoutOptions = LAYOPT_WITHBRANCH | LAYOPT_WITHSYSCAT | LAYOPT_WITHCAT | LAYOPT_WITHDETAILS;
 				
 				if (SYSTEM_BRANCH_ID.equals(catItem.storeId)) {
+					dr.add(new ALCatalogsBelongToCatalog(catItem.getSyscatId(), null, RECURSIVE, 10, 8, 5));
+					/*ICatalog syscat = PartnerManager.instance.getSystemCatalog(catItem.getSyscatId());
+					dr.add(TYPENAME_COMPOUND, new ALCatalogsBelongToCatalog(catItem.getSyscatId(), null, RECURSIVE, 10, 8, 5),
+							new ALCatalogsBelongToCatalog(syscat.get, null, RECURSIVE, 10, 8, 5));*/
 					dr.add(new ALItemBelongToSyscat(catItem.getSyscatId(), null, RECURSIVE, 10, 10, 10)
 						.layopts(LAYOPT_WITHBRANCH | LAYOPT_WITHSYSCAT).unshownSyscat(catItem.getSyscatId()));
 				} else {
+					dr.add(new ALCatalogsBelongToCatalog(catItem.getCatalogId(), null, RECURSIVE, 10, 8, 5));
+					/*dr.add(TYPENAME_COMPOUND, new ALCatalogsBelongToCatalog(catItem.getCatalogId(), null, RECURSIVE, 10, 8, 5),
+							new ALCatalogsBelongToCatalog(parentCat, null, RECURSIVE, 10, 8, 5));*/
 					dr.add(new ALItemBelongToCatalog(catItem.getCatalogId(), catItem.getSyscatId(), targetId, RECURSIVE, 10, 10, 10)
 						.layopts(LAYOPT_WITHCAT).unshownCat(catItem.getCatalogId()));
 				}
-				//dr.add(new ALCatalogsBelongToCatalog(cat.getParentCatalogId(), catItem.getCatalogId(), DIRECT, 10, 8, 5));
 				return dr;
 				/*Catalog cat = (Catalog) new CatalogDao().loadCatalog(targetId, false);
 				JsonArray ja = findSubCatalogs(targetId, null, 8);

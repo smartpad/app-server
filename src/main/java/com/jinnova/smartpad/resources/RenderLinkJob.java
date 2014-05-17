@@ -68,9 +68,9 @@ class RenderLinkJob {
 					html = "<a href='" + HOST + TYPENAME_SYSCAT + "/" + json.get(FIELD_SYSCATID).getAsString() + "/drill" + "'>" + value + "</a>";
 				} else if (FIELD_BRANCHNAME.equals(entry.getKey())) {
 					html = "<a href='" + HOST + TYPENAME_BRANCH + "/" + json.get(FIELD_BRANCHID).getAsString() + "/drill" + "'>" + value + "</a>";
-				} else if (FIELD_CATNAME.equals(entry.getKey())) {
+				} /*else if (FIELD_CATNAME.equals(entry.getKey())) {
 					html = "<a href='" + HOST + TYPENAME_CAT + "/" + json.get(FIELD_CATID).getAsString() + "/drill" + "'>" + value + "</a>";
-				} else if (FIELD_UP_NAME.equals(entry.getKey())) {
+				}*/ else if (FIELD_UP_NAME.equals(entry.getKey())) {
 					html = "<a href='" + HOST + json.get(FIELD_TYPE).getAsString() + "/" + json.get(FIELD_UP_ID).getAsString() + "/drill" + "'>" + value + "</a>";
 				} else {
 					Renderer r = Renderer.renderers.get(feedType);
