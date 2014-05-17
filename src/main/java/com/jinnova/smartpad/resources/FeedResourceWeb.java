@@ -77,10 +77,12 @@ public class FeedResourceWeb extends FeedResource {
     		@QueryParam("recur") boolean recursive, @QueryParam("lon")String lon, @QueryParam("lat")String lat, 
     		@QueryParam("offset") int offset, @QueryParam("size")int size, 
     		@QueryParam("layopts") @DefaultValue("" + Feed.LAYOPT_NONE) int layoutOptions,
-    		@QueryParam("laysc") String layoutSyscat) throws SQLException {
+    		@QueryParam("laysc") String layoutSyscat,
+    		@QueryParam("excat") String excludeCat) throws SQLException {
 
     	String s = super.more(clusterId, targetType, relation, anchorType, anchorId, 
-    			branchId, storeId, catId, syscatId, excludeId, segments, recursive, lon, lat, offset, size, layoutOptions, layoutSyscat);
+    			branchId, storeId, catId, syscatId, excludeId, segments, recursive, lon, lat, 
+    			offset, size, layoutOptions, layoutSyscat, excludeCat);
 		return new RenderLinkJob(s).render();
     }
     

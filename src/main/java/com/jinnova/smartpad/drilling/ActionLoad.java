@@ -69,6 +69,8 @@ abstract class ActionLoad {
 	
 	String excludeSyscat;
 	
+	String excludeCat;
+	
 	private int layoutOptions = Feed.LAYOPT_NONE;
 	
 	//private String layoutSyscat;
@@ -143,6 +145,13 @@ abstract class ActionLoad {
 		return this;
 	}
 	
+	ActionLoad unshownCat(String excludeCat) {
+		//this.layoutSyscat = layoutSyscat;
+		//layoutParams.put(Feed.LAYOUT_PARAM_SYSCAT_EXCLUDE, layoutSyscat);
+		this.excludeCat = excludeCat;
+		return this;
+	}
+	
 	/*ActionLoad layoutParam(String key, String value) {
 		layoutParams.put(key, value);
 		return this;
@@ -210,6 +219,9 @@ abstract class ActionLoad {
 		if (excludeSyscat != null) {
 			buffer.append("&exsyscat=" + excludeSyscat);
 		}
+		if (excludeCat != null) {
+			buffer.append("&excat=" + excludeCat);
+		}
 		buffer.append("&recur=" + recursive);
 		buffer.append("&layopts=" + layoutOptions);
 		
@@ -225,6 +237,7 @@ abstract class ActionLoad {
 		params.put(Feed.LAYOUT_PARAM_LINKPREFIX, this.linkPrefix);
 		params.put(Feed.LAYOUT_PARAM_SEGMENTS, this.segments);
 		params.put(Feed.LAYOUT_PARAM_SYSCAT_EXCLUDE, this.excludeSyscat);
+		params.put(Feed.LAYOUT_PARAM_CAT_EXCLUDE, this.excludeCat);
 		return params;
 	}
 	

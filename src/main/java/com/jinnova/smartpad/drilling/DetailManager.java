@@ -91,7 +91,7 @@ public class DetailManager implements IDetailManager {
 	public String more(int clusterId, String targetType, String anchorType, String anchorId, String relation,
 			String branchId, String storeId, String catId, String syscatId, String excludeId, List<String> segments,
 			boolean recursive, String gpsLon, String gpsLat, int offset, int size, 
-			int layoutOptions, String excludeSyscat) throws SQLException {
+			int layoutOptions, String excludeSyscat, String excludeCat) throws SQLException {
 		
 		ActionLoad action = ActionLoad.createLoad(targetType, anchorType, relation);
 		action.clusterId = clusterId;
@@ -105,6 +105,7 @@ public class DetailManager implements IDetailManager {
 		//action.layoutParams.put(Feed.LAYOUT_PARAM_SEGMENTS, segments);
 		action.layopts(layoutOptions);
 		action.excludeSyscat = excludeSyscat;
+		action.excludeCat = excludeCat;
 		if (gpsLon != null) {
 			action.gpsLon = new BigDecimal(gpsLon);
 		}
@@ -311,8 +312,13 @@ public class DetailManager implements IDetailManager {
 				dr.add(catItem);
 				dr.layoutOptions = LAYOPT_WITHBRANCH | LAYOPT_WITHSYSCAT | LAYOPT_WITHCAT | LAYOPT_WITHDETAILS;
 				
-				dr.add(new ALItemBelongToCatalog(catItem.getCatalogId(), catItem.getSyscatId(), targetId, RECURSIVE, 10, 10, 10).layopts(LAYOPT_WITHCAT)
-						/*.unshownSyscat(catItem.getCatalogId())*/.unshownSyscat(catItem.getSyscatId()));
+				if (SYSTEM_BRANCH_ID.equals(catItem.storeId)) {
+					dr.add(new ALItemBelongToSyscat(catItem.getSyscatId(), null, RECURSIVE, 10, 10, 10)
+						.layopts(LAYOPT_WITHBRANCH | LAYOPT_WITHSYSCAT).unshownSyscat(catItem.getSyscatId()));
+				} else {
+					dr.add(new ALItemBelongToCatalog(catItem.getCatalogId(), catItem.getSyscatId(), targetId, RECURSIVE, 10, 10, 10)
+						.layopts(LAYOPT_WITHCAT).unshownCat(catItem.getCatalogId()));
+				}
 				//dr.add(new ALCatalogsBelongToCatalog(cat.getParentCatalogId(), catItem.getCatalogId(), DIRECT, 10, 8, 5));
 				return dr;
 				/*Catalog cat = (Catalog) new CatalogDao().loadCatalog(targetId, false);
