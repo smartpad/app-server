@@ -102,9 +102,9 @@ public class DetailManager implements IDetailManager {
 		action.pageSize = size;
 		action.recursive = recursive;
 		action.segments = segments;
-		action.layoutParams.put(Feed.LAYOUT_PARAM_SEGMENTS, segments);
+		//action.layoutParams.put(Feed.LAYOUT_PARAM_SEGMENTS, segments);
 		action.layopts(layoutOptions);
-		action.unshownSyscat(excludeSyscat);
+		action.excludeSyscat = excludeSyscat;
 		if (gpsLon != null) {
 			action.gpsLon = new BigDecimal(gpsLon);
 		}
@@ -113,10 +113,12 @@ public class DetailManager implements IDetailManager {
 		}
 		
 		Object[] data = action.load();
-		action.layoutParams.put(LAYOUT_PARAM_LINKPREFIX, linkPrefix);
+		//action.layoutParams.put(LAYOUT_PARAM_LINKPREFIX, linkPrefix);
+		action.linkPrefix = linkPrefix;
 		JsonArray array = new JsonArray();
+		HashMap<String, Object> layoutParams = action.getLayoutParams();
 		for (int i = 0; i < data.length; i++) {
-			array.add(((Feed) data[i]).generateFeedJson(layoutOptions, action.layoutParams));
+			array.add(((Feed) data[i]).generateFeedJson(layoutOptions, layoutParams));
 		}
 		
 		JsonObject dataJson = new JsonObject();
@@ -310,7 +312,7 @@ public class DetailManager implements IDetailManager {
 				dr.layoutOptions = LAYOPT_WITHBRANCH | LAYOPT_WITHSYSCAT | LAYOPT_WITHCAT | LAYOPT_WITHDETAILS;
 				
 				dr.add(new ALItemBelongToCatalog(catItem.getCatalogId(), catItem.getSyscatId(), targetId, RECURSIVE, 10, 10, 10).layopts(LAYOPT_WITHCAT)
-						.unshownSyscat(catItem.getCatalogId()));
+						/*.unshownSyscat(catItem.getCatalogId())*/.unshownSyscat(catItem.getSyscatId()));
 				//dr.add(new ALCatalogsBelongToCatalog(cat.getParentCatalogId(), catItem.getCatalogId(), DIRECT, 10, 8, 5));
 				return dr;
 				/*Catalog cat = (Catalog) new CatalogDao().loadCatalog(targetId, false);

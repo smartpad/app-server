@@ -26,6 +26,10 @@ abstract class ActionLoad {
 	
 	static final String REL_SEGMENT = "seg";
 	
+	private static HashMap<String, Class<? extends ActionLoad>> actionClasses;
+	
+	private static boolean initializing = true;
+	
 	String branchId;
 	
 	String storeId;
@@ -60,19 +64,19 @@ abstract class ActionLoad {
 	private int initialLoadSize;
 	
 	private int initialDrillSize;
-
-	private boolean more = true;
-	
-	private static HashMap<String, Class<? extends ActionLoad>> actionClasses;
-	
-	private static boolean initializing = true;
 	
 	boolean recursive = false;
+	
+	String excludeSyscat;
 	
 	private int layoutOptions = Feed.LAYOPT_NONE;
 	
 	//private String layoutSyscat;
-	HashMap<String, Object> layoutParams = new HashMap<>();
+	//HashMap<String, Object> layoutParams = new HashMap<>();
+
+	private boolean more = true;
+	
+	String linkPrefix;
 	
 	static void initialize() {
 		if (actionClasses != null) {
@@ -132,16 +136,17 @@ abstract class ActionLoad {
 		return this.layoutSyscat;
 	}*/
 	
-	ActionLoad unshownSyscat(String layoutSyscat) {
+	ActionLoad unshownSyscat(String excludeSyscat) {
 		//this.layoutSyscat = layoutSyscat;
-		layoutParams.put(Feed.LAYOUT_PARAM_SYSCAT_EXCLUDE, layoutSyscat);
+		//layoutParams.put(Feed.LAYOUT_PARAM_SYSCAT_EXCLUDE, layoutSyscat);
+		this.excludeSyscat = excludeSyscat;
 		return this;
 	}
 	
-	ActionLoad layoutParam(String key, String value) {
+	/*ActionLoad layoutParam(String key, String value) {
 		layoutParams.put(key, value);
 		return this;
-	}
+	}*/
 	
 	ActionLoad(String anchorType, String targetType, String relation) {
 		if (!initializing && !actionClasses.containsKey(anchorType + targetType + relation)) {
@@ -202,15 +207,26 @@ abstract class ActionLoad {
 		if (gpsLat != null) {
 			buffer.append("&lat=" + gpsLat.toPlainString());
 		}
+		if (excludeSyscat != null) {
+			buffer.append("&exsyscat=" + excludeSyscat);
+		}
 		buffer.append("&recur=" + recursive);
 		buffer.append("&layopts=" + layoutOptions);
-		/*if (layoutSyscat != null) {
-			buffer.append("&laysc=" + layoutSyscat);
-		}*/
+		
+		//buffer.append("&");
+		//buffer.append(buildParamSet(layoutParams));
 		return buffer.toString();
 	}
 	
 	abstract Object[] load(int offset, int size) throws SQLException;
+	
+	HashMap<String, Object> getLayoutParams() {
+		HashMap<String, Object> params = new HashMap<String, Object>();
+		params.put(Feed.LAYOUT_PARAM_LINKPREFIX, this.linkPrefix);
+		params.put(Feed.LAYOUT_PARAM_SEGMENTS, this.segments);
+		params.put(Feed.LAYOUT_PARAM_SYSCAT_EXCLUDE, this.excludeSyscat);
+		return params;
+	}
 	
 	Object[] loadFirstEntries() throws SQLException {
 		return load(0, initialLoadSize);

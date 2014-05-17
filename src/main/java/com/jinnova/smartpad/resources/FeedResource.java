@@ -95,10 +95,10 @@ public class FeedResource {
     		@QueryParam("recur")boolean recursize, @QueryParam("lon")String lon, @QueryParam("lat")String lat, 
     		@QueryParam("offset")int offset, @QueryParam("size")int size, 
     		@QueryParam("layopts") @DefaultValue("" + Feed.LAYOPT_NONE) int layoutOptions,
-    		@QueryParam("laysc") String layoutSyscat) throws SQLException {
+    		@QueryParam("exsyscat") String excludeSyscat) throws SQLException {
 
     	return detailManager.more(clusterId, targetType, anchorType, anchorId, relation, 
-    			branchId, storeId, catId, syscatId, excludeId, segments, recursize, lon, lat, offset, size, layoutOptions, layoutSyscat);
+    			branchId, storeId, catId, syscatId, excludeId, segments, recursize, lon, lat, offset, size, layoutOptions, excludeSyscat);
     }
     
 }

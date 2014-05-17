@@ -157,15 +157,16 @@ class DrillSectionSimple implements DrillSection {
 		
 		int layOpts = actionLoad.getLayopts();
 		//String layoutSyscat = actionLoad.getLayoutSyscat();
-		actionLoad.layoutParams.put(Feed.LAYOUT_PARAM_LINKPREFIX, linkPrefix);
+		actionLoad.linkPrefix = linkPrefix;
+		HashMap<String, Object> layoutParams = actionLoad.getLayoutParams();
 		if (ja.length == 1) {
-			return ((Feed) ja[0]).generateFeedJson(layOpts, actionLoad.layoutParams);
+			return ((Feed) ja[0]).generateFeedJson(layOpts, layoutParams);
 		}
 		
 		JsonArray array = new JsonArray();
 		int actualCount = Math.min(expectedSize, ja.length);
 		for (int i = 0; i < actualCount; i++) {
-			array.add(((Feed) ja[i]).generateFeedJson(layOpts, actionLoad.layoutParams));
+			array.add(((Feed) ja[i]).generateFeedJson(layOpts, layoutParams));
 		}
 		
 		JsonObject json = new JsonObject();
@@ -196,9 +197,10 @@ class DrillSectionSimple implements DrillSection {
 		int actualCount = Math.min(expectedSize, ja.length);
 		int layOpts = actionLoad.getLayopts();
 		//String layoutSyscat = actionLoad.getLayoutSyscat();
-		actionLoad.layoutParams.put(Feed.LAYOUT_PARAM_LINKPREFIX, linkPrefix);
+		actionLoad.linkPrefix = linkPrefix;
+		HashMap<String, Object> layoutParams = actionLoad.getLayoutParams();
 		for (int i = 0; i < actualCount; i++) {
-			jsonList.add(((Feed) ja[i]).generateFeedJson(layOpts, actionLoad.layoutParams));
+			jsonList.add(((Feed) ja[i]).generateFeedJson(layOpts, layoutParams));
 			copied = true;
 		}
 		actionLoad.setOffset(actualCount);
