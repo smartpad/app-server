@@ -176,7 +176,7 @@ public class DetailManager implements IDetailManager {
 				}
 				
 				dr.add(new ALBranchesBelongToSyscat(syscatId, null, RECURSIVE, 5, 5, 5)
-					.layopts(LAYOPT_WITHSYSCAT).unshownSyscat(syscatId));
+					.layopts(LAYOPT_WITHSYSCAT | LAYOPT_NAMELINK).unshownSyscat(syscatId));
 				
 				dr.add(new ALCatalogsBelongToCatalog(syscatId, null, DIRECT, 5, 5, 5));
 				
@@ -204,8 +204,10 @@ public class DetailManager implements IDetailManager {
 
 				//At most 5 stores belong to this branch and 3 similar branches
 				dr.add(TYPENAME_COMPOUND_BRANCHSTORE, 
-						new ALStoresBelongToBranch(branchId, null, 10, 8, 5), 
-						new ALBranchesBelongToSyscat(syscatId, branchId, DIRECT, 10, 8, 3));
+						new ALStoresBelongToBranch(branchId, null, 10, 8, 5)
+							.layopts(LAYOPT_NAMELINK | LAYOPT_STORE), 
+						new ALBranchesBelongToSyscat(syscatId, branchId, DIRECT, 10, 8, 3)
+							.layopts(LAYOPT_NAMELINK));
 				
 				//5 active promotions by syscat, this branch first 
 				dr.add(new ALPromotionsBelongToSyscat(syscatId, null, branchId, DIRECT, clusterId, 10, 5, 5));
