@@ -258,19 +258,21 @@ public class DetailManager implements IDetailManager {
 					syscatId = cat.getSystemCatalogId();
 				}*/
 				Catalog cat = (Catalog) new CatalogDao().loadCatalog(targetId, false);
-				if (cat == null) {
+				
+				//cat is null if targetId is in an unmanaged branch  
+				/*if (cat == null) {
 					Operation branch = new OperationDao().loadBranch(targetId);
 					if (branch != null) {
 						cat = (Catalog) branch.getRootCatalog();
 					}
-				}
+				}*/
 				String syscatId = cat.getSystemCatalogId();
 
 				DrillResult dr = createDefaultDrills(clusterId, lon, lat);
 				createBranchAlerts(dr, syscatId);
 				
 				dr.add(cat);
-				dr.layoutOptions = LAYOPT_WITHSYSCAT | LAYOPT_WITHBRANCH;
+				dr.layoutOptions = LAYOPT_PRIVATECAT | LAYOPT_WITHPARENT | LAYOPT_WITHSYSCAT | LAYOPT_WITHBRANCH;
 				
 				/*dr.add(TYPENAME_COMPOUND, 
 						new ALCatalogsBelongToCatalog(targetId, null, DIRECT, 10, 8, 5), 
@@ -279,14 +281,14 @@ public class DetailManager implements IDetailManager {
 				//5 active promotions from this branch in one compound
 				dr.add(new ALPromotionsBelongToSyscat(syscatId, null, cat.branchId, DIRECT, clusterId, 10, 5, 5));
 				
-				//5 feature items from this catalog
-				dr.add(new ALItemBelongToCatalog(targetId, syscatId, null, RECURSIVE, 10, 5, 5));
-				
 				//5 other stores, 3 similar branches
 				//ja = StoreDriller.findStoresOfBranch(cat.branchId, cat.storeId, 0, 8);
 				dr.add(TYPENAME_COMPOUND_BRANCHSTORE, 
 						new ALStoresBelongToBranch(cat.branchId, cat.storeId, 10, 8, 5), 
 						new ALBranchesBelongToSyscat(syscatId, cat.branchId, DIRECT, 10, 8, 3));
+				
+				//5 feature items from this catalog
+				dr.add(new ALItemBelongToCatalog(targetId, syscatId, null, RECURSIVE, 10, 5, 5));
 				
 				//remain items from this catalog
 				//dr.add(new ALItemBelongToCatalog(targetId, null, RECURSIVE, 10, 5, 5));
@@ -313,16 +315,22 @@ public class DetailManager implements IDetailManager {
 				dr.layoutOptions = LAYOPT_WITHBRANCH | LAYOPT_WITHSYSCAT | LAYOPT_WITHCAT | LAYOPT_WITHDETAILS;
 				
 				if (SYSTEM_BRANCH_ID.equals(catItem.storeId)) {
-					dr.add(new ALCatalogsBelongToCatalog(catItem.getSyscatId(), null, RECURSIVE, 10, 8, 5));
-					/*ICatalog syscat = PartnerManager.instance.getSystemCatalog(catItem.getSyscatId());
-					dr.add(TYPENAME_COMPOUND, new ALCatalogsBelongToCatalog(catItem.getSyscatId(), null, RECURSIVE, 10, 8, 5),
-							new ALCatalogsBelongToCatalog(syscat.get, null, RECURSIVE, 10, 8, 5));*/
+					//dr.add(new ALCatalogsBelongToCatalog(catItem.getSyscatId(), null, RECURSIVE, 10, 8, 5));
+					Catalog syscat = (Catalog) PartnerManager.instance.getSystemCatalog(catItem.getSyscatId());
+					dr.add(TYPENAME_COMPOUND, 
+							new ALCatalogsBelongToCatalog(catItem.getSyscatId(), null, RECURSIVE, 10, -1, -1),
+							new ALCatalogsBelongToCatalog(syscat.getParentCatalogId(), catItem.getSyscatId(), RECURSIVE, 10, -1, -1)
+								.unshownSyscat(catItem.getSyscatId()));
+					
 					dr.add(new ALItemBelongToSyscat(catItem.getSyscatId(), null, RECURSIVE, 10, 10, 10)
 						.layopts(LAYOPT_WITHBRANCH | LAYOPT_WITHSYSCAT).unshownSyscat(catItem.getSyscatId()));
+					
 				} else {
-					dr.add(new ALCatalogsBelongToCatalog(catItem.getCatalogId(), null, RECURSIVE, 10, 8, 5));
-					/*dr.add(TYPENAME_COMPOUND, new ALCatalogsBelongToCatalog(catItem.getCatalogId(), null, RECURSIVE, 10, 8, 5),
-							new ALCatalogsBelongToCatalog(parentCat, null, RECURSIVE, 10, 8, 5));*/
+					//dr.add(new ALCatalogsBelongToCatalog(catItem.getCatalogId(), null, RECURSIVE, 10, 8, 5));
+					dr.add(TYPENAME_COMPOUND, 
+							new ALCatalogsBelongToCatalog(catItem.getCatalogId(), null, RECURSIVE, 10, 20, 20),
+							new ALCatalogsBelongToCatalog(catItem.getParentCatId(), catItem.getCatalogId(), RECURSIVE, 10, 8, 5)
+								.unshownCat(catItem.getCatalogId()));
 					dr.add(new ALItemBelongToCatalog(catItem.getCatalogId(), catItem.getSyscatId(), targetId, RECURSIVE, 10, 10, 10)
 						.layopts(LAYOPT_WITHCAT).unshownCat(catItem.getCatalogId()));
 				}
