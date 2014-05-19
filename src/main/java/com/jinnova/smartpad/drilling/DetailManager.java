@@ -176,7 +176,7 @@ public class DetailManager implements IDetailManager {
 				}
 				
 				dr.add(new ALBranchesBelongToSyscat(syscatId, null, RECURSIVE, 5, 5, 5)
-					.layopts(LAYOPT_WITHSYSCAT | LAYOPT_NAMELINK).unshownSyscat(syscatId));
+					.layopts(LAYOPT_WITHSYSCAT).unshownSyscat(syscatId));
 				
 				dr.add(new ALCatalogsBelongToCatalog(syscatId, null, DIRECT, 5, 5, 5));
 				
@@ -204,10 +204,8 @@ public class DetailManager implements IDetailManager {
 
 				//At most 5 stores belong to this branch and 3 similar branches
 				dr.add(TYPENAME_COMPOUND_BRANCHSTORE, 
-						new ALStoresBelongToBranch(branchId, null, 10, 8, 5)
-							.layopts(LAYOPT_NAMELINK | LAYOPT_STORE), 
-						new ALBranchesBelongToSyscat(syscatId, branchId, DIRECT, 10, 8, 3)
-							.layopts(LAYOPT_NAMELINK));
+						new ALStoresBelongToBranch(branchId, null, 10, 8, 5).layopts(LAYOPT_NAMELINK | LAYOPT_STORE), 
+						new ALBranchesBelongToSyscat(syscatId, branchId, DIRECT, 10, 8, 3).layopts(LAYOPT_NAMELINK));
 				
 				//5 active promotions by syscat, this branch first 
 				dr.add(new ALPromotionsBelongToSyscat(syscatId, null, branchId, DIRECT, clusterId, 10, 5, 5));
@@ -231,12 +229,17 @@ public class DetailManager implements IDetailManager {
 				createSyscatAlerts(dr, targetStore.getSyscatId());
 				
 				dr.add(targetStore);
-				dr.layoutOptions = LAYOPT_WITHBRANCH | LAYOPT_WITHSYSCAT;
+				dr.layoutOptions = LAYOPT_WITHBRANCH | LAYOPT_WITHSYSCAT | LAYOPT_STORE;
 				
 				//5 stores belong in same branch with this store, and 3 similar branches
+				String syscatId = targetStore.getSyscatId();
 				dr.add(TYPENAME_COMPOUND_BRANCHSTORE, 
-						new ALStoresBelongToBranch(targetStore.getBranchId(), targetId, 10, 8, 5), 
-						new ALBranchesBelongToSyscat(targetStore.getSyscatId(), targetStore.getBranchId(), DIRECT, 10, 8, 3));
+						new ALStoresBelongToBranch(targetStore.getBranchId(), targetId, 10, 8, 5)
+							.layopts(LAYOPT_STORE | LAYOPT_NAMELINK | LAYOPT_WITHBRANCH | LAYOPT_WITHSYSCAT)
+							.unshownSyscat(syscatId), 
+						new ALBranchesBelongToSyscat(targetStore.getSyscatId(), targetStore.getBranchId(), DIRECT, 10, 8, 3)
+							.layopts(LAYOPT_NAMELINK | LAYOPT_WITHSYSCAT)
+							.unshownSyscat(syscatId));
 				
 				//Some active promotions from this branch in one compound
 				dr.add(new ALPromotionsBelongToSyscat(targetStore.getSyscatId(), null, targetStore.getBranchId(), DIRECT, clusterId, 10, 10, 10));
@@ -274,7 +277,7 @@ public class DetailManager implements IDetailManager {
 				createBranchAlerts(dr, syscatId);
 				
 				dr.add(cat);
-				dr.layoutOptions = LAYOPT_PRIVATECAT | LAYOPT_WITHPARENT | LAYOPT_WITHSYSCAT | LAYOPT_WITHBRANCH;
+				dr.layoutOptions = LAYOPT_WITHSYSCAT | LAYOPT_WITHBRANCH;
 				
 				/*dr.add(TYPENAME_COMPOUND, 
 						new ALCatalogsBelongToCatalog(targetId, null, DIRECT, 10, 8, 5), 
