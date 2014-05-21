@@ -25,6 +25,9 @@ public class ImageResource {
 			@PathParam("imageId") String imageId, @QueryParam("size") int size) throws IOException {
 
 	    BufferedImage image = PartnerManager.instance.getImage(typeName, null, entityId, imageId, size);
+	    if (image == null) {
+	    	return null;
+	    }
 
 	    ByteArrayOutputStream baos = new ByteArrayOutputStream();
 	    ImageIO.write(image, "png", baos);
