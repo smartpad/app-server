@@ -320,7 +320,7 @@ public class DetailManager implements IDetailManager {
 				dr.add(catItem);
 				dr.layoutOptions = LAYOPT_WITHBRANCH | LAYOPT_WITHSYSCAT | LAYOPT_WITHCAT | LAYOPT_WITHDETAILS;
 				
-				if (SYSTEM_BRANCH_ID.equals(catItem.storeId)) {
+				if (SYSTEM_BRANCH_ID.equals(catItem.getStoreId())) {
 					//dr.add(new ALCatalogsBelongToCatalog(catItem.getSyscatId(), null, RECURSIVE, 10, 8, 5));
 					Catalog syscat = (Catalog) PartnerManager.instance.getSystemCatalog(catItem.getSyscatId());
 					dr.add(TYPENAME_COMPOUND, 
