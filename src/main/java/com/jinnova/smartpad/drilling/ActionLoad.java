@@ -130,7 +130,7 @@ abstract class ActionLoad {
 	}
 	
 	ActionLoad layopts(int layoutOptions) {
-		this.layoutOptions = layoutOptions;
+		this.layoutOptions = this.layoutOptions | layoutOptions;
 		return this;
 	}
 	
@@ -323,6 +323,7 @@ class ALStoresBelongToBranch extends ActionLoad {
 	
 	ALStoresBelongToBranch() {
 		super(TYPENAME_BRANCH, TYPENAME_STORE, REL_BELONG);
+		this.layopts(Feed.LAYOPT_STORE);
 	}
 
 	ALStoresBelongToBranch(String anchorBranchId, String excludeStoreId, int pageSize, int initialLoadSize, int initialDrillSize) {

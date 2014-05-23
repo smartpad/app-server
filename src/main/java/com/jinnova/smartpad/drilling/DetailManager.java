@@ -131,6 +131,7 @@ public class DetailManager implements IDetailManager {
 		//System.out.println("next load: " + actionLoad.generateNextLoadUrl());
     	JsonObject resultJson = new JsonObject();
     	resultJson.add(VERSIONING_TARGET, dataJson);
+    	//return new GsonBuilder().create().toJson(resultJson);
 		return resultJson.toString();
 	}
 	

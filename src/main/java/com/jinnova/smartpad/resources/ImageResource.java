@@ -10,7 +10,6 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 import com.jinnova.smartpad.partner.PartnerManager;
@@ -18,11 +17,11 @@ import com.jinnova.smartpad.partner.PartnerManager;
 @Path("/images")
 public class ImageResource {
 	
-	@Path("/{typeName}/{entityId}/{imageId}")
+	@Path("/{typeName}/{entityId}/sizes/{imageId}_{size}.png")
 	@Produces("image/png")
     @GET
 	public Response getFullImage(@PathParam("typeName") String typeName, @PathParam("entityId") String entityId, 
-			@PathParam("imageId") String imageId, @QueryParam("size") int size) throws IOException {
+			@PathParam("imageId") String imageId, @PathParam("size") int size) throws IOException {
 
 	    BufferedImage image = PartnerManager.instance.getImage(typeName, null, entityId, imageId, size);
 	    if (image == null) {
