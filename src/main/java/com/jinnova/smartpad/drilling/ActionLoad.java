@@ -174,6 +174,9 @@ abstract class ActionLoad {
 		this.pageSize = pageSize;
 		this.initialLoadSize = initialLoadSize;
 		this.initialDrillSize = initialDrillSize;
+		if (this.initialLoadSize < initialDrillSize) {
+			throw new IllegalArgumentException();
+		}
 	}
 	
 	ActionLoad exclude(String excludeId) {
