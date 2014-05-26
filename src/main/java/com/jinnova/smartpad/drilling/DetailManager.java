@@ -177,9 +177,9 @@ public class DetailManager implements IDetailManager {
 				}
 				
 				dr.add(new ALBranchesBelongToSyscat(syscatId, null, RECURSIVE, 5, 5, 5)
-					.layopts(LAYOPT_WITHSYSCAT).unshownSyscat(syscatId));
+					.layopts(LAYOPT_WITHSYSCAT | LAYOPT_NAMELINK).unshownSyscat(syscatId));
 				
-				dr.add(new ALCatalogsBelongToCatalog(syscatId, null, DIRECT, 5, 5, 5).layopts(LAYOPT_NAMELINK | LAYOPT_PRIVATECAT));
+				dr.add(new ALCatalogsBelongToCatalog(syscatId, null, DIRECT, 5, 5, 5).layopts(LAYOPT_NAMELINK));
 				
 				dr.add(new ALItemBelongToSyscat(syscatId, segments, RECURSIVE, 10, 10, 10)
 					.layopts(LAYOPT_WITHBRANCH | LAYOPT_WITHSYSCAT)
@@ -201,7 +201,7 @@ public class DetailManager implements IDetailManager {
 				
 				//details of this branch
 				dr.add(branch);
-				dr.layoutOptions = LAYOPT_WITHSYSCAT;
+				dr.layoutOptions = LAYOPT_WITHSYSCAT | LAYOPT_WITHDETAILS;
 
 				//At most 5 stores belong to this branch and 3 similar branches
 				dr.add(TYPENAME_COMPOUND_BRANCHSTORE, 
@@ -334,9 +334,10 @@ public class DetailManager implements IDetailManager {
 					//dr.add(new ALCatalogsBelongToCatalog(catItem.getSyscatId(), null, RECURSIVE, 10, 8, 5));
 					Catalog syscat = (Catalog) PartnerManager.instance.getSystemCatalog(catItem.getSyscatId());
 					dr.add(TYPENAME_COMPOUND, 
-							new ALCatalogsBelongToCatalog(catItem.getSyscatId(), null, RECURSIVE, 10, -1, -1),
+							new ALCatalogsBelongToCatalog(catItem.getSyscatId(), null, RECURSIVE, 10, -1, -1)
+								.layopts(LAYOPT_NAMELINK),
 							new ALCatalogsBelongToCatalog(syscat.getParentCatalogId(), catItem.getSyscatId(), RECURSIVE, 10, -1, -1)
-								.unshownSyscat(catItem.getSyscatId()));
+								.layopts(LAYOPT_NAMELINK).unshownSyscat(catItem.getSyscatId()));
 					
 					dr.add(new ALItemBelongToSyscat(catItem.getSyscatId(), null, RECURSIVE, 10, 10, 10)
 						.layopts(LAYOPT_WITHBRANCH | LAYOPT_WITHSYSCAT).unshownSyscat(catItem.getSyscatId()));
@@ -344,9 +345,10 @@ public class DetailManager implements IDetailManager {
 				} else {
 					//dr.add(new ALCatalogsBelongToCatalog(catItem.getCatalogId(), null, RECURSIVE, 10, 8, 5));
 					dr.add(TYPENAME_COMPOUND, 
-							new ALCatalogsBelongToCatalog(catItem.getCatalogId(), null, RECURSIVE, 10, 20, 20),
+							new ALCatalogsBelongToCatalog(catItem.getCatalogId(), null, RECURSIVE, 10, 20, 20)
+								.layopts(LAYOPT_NAMELINK | LAYOPT_PRIVATECAT),
 							new ALCatalogsBelongToCatalog(catItem.getParentCatId(), catItem.getCatalogId(), RECURSIVE, 10, 8, 5)
-								.unshownCat(catItem.getCatalogId()));
+								.layopts(LAYOPT_NAMELINK | LAYOPT_PRIVATECAT).unshownCat(catItem.getCatalogId()));
 					dr.add(new ALItemBelongToCatalog(catItem.getCatalogId(), catItem.getSyscatId(), targetId, RECURSIVE, 10, 10, 10)
 						.layopts(LAYOPT_WITHCAT).unshownCat(catItem.getCatalogId()));
 				}
