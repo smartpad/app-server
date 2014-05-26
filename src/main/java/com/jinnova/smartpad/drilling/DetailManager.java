@@ -212,7 +212,7 @@ public class DetailManager implements IDetailManager {
 				dr.add(new ALPromotionsBelongToSyscat(syscatId, null, branchId, DIRECT, clusterId, 10, 5, 5));
 				
 				//10 sub categories of this branch's root category in one compound
-				//dr.add(new ALCatalogsBelongToCatalog(branchId, null, DIRECT, 10, 10, 10));
+				dr.add(new ALCatalogsBelongToCatalog(branchId, null, DIRECT, 10, 10, 10));
 				
 				//catelog items from this branch's root category
 				dr.add(new ALItemBelongToCatalog(branchId, syscatId, null, RECURSIVE, 20, 20, 20).layopts(Feed.LAYOPT_WITHCAT));
@@ -230,20 +230,28 @@ public class DetailManager implements IDetailManager {
 				createSyscatAlerts(dr, targetStore.getSyscatId());
 				
 				dr.add(targetStore);
-				dr.layoutOptions = LAYOPT_WITHBRANCH | LAYOPT_WITHSYSCAT | LAYOPT_STORE;
+				dr.layoutOptions = LAYOPT_WITHBRANCH | LAYOPT_WITHSYSCAT | LAYOPT_STORE | LAYOPT_WITHDETAILS;
 				
-				//5 stores belong in same branch with this store, and 3 similar branches
+				//5 other stores belong in same branch with this store, and 3 similar branches
 				String syscatId = targetStore.getSyscatId();
 				dr.add(TYPENAME_COMPOUND_BRANCHSTORE, 
-						new ALStoresBelongToBranch(targetStore.getBranchId(), targetId, 10, 8, 5)
-							.layopts(LAYOPT_STORE | LAYOPT_NAMELINK | LAYOPT_WITHBRANCH | LAYOPT_WITHSYSCAT)
-							.unshownSyscat(syscatId), 
+						new ALStoresBelongToBranch(targetStore.getBranchId(), targetId, 10, 10, 10).layopts(LAYOPT_NAMELINK), 
 						new ALBranchesBelongToSyscat(targetStore.getSyscatId(), targetStore.getBranchId(), DIRECT, 10, 8, 3)
 							.layopts(LAYOPT_NAMELINK | LAYOPT_WITHSYSCAT)
 							.unshownSyscat(syscatId));
 				
+				//sub catalogs
+				dr.add(TYPENAME_COMPOUND,
+						new ALCatalogsBelongToCatalog(targetId, null, DIRECT, 10, 10, 10),
+						new ALCatalogsBelongToCatalog(targetStore.getBranchId(), null, DIRECT, 10, 10, 10));
+				
 				//Some active promotions from this branch in one compound
-				dr.add(new ALPromotionsBelongToSyscat(targetStore.getSyscatId(), null, targetStore.getBranchId(), DIRECT, clusterId, 10, 10, 10));
+				dr.add(new ALPromotionsBelongToSyscat(syscatId, null, targetStore.getBranchId(), DIRECT, clusterId, 10, 10, 10));
+				
+				//catelog items from this store's root category
+				dr.add(new ALItemBelongToCatalog(targetId, syscatId, null, RECURSIVE, 20, 20, 20).layopts(Feed.LAYOPT_WITHCAT));
+				//catelog items from this branch's root category
+				dr.add(new ALItemBelongToCatalog(targetStore.getBranchId(), syscatId, null, RECURSIVE, 20, 20, 20).layopts(Feed.LAYOPT_WITHCAT));
 				return dr;
 			}
 			
