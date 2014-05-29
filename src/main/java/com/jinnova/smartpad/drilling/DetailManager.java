@@ -20,6 +20,7 @@ import com.jinnova.smartpad.db.OperationDao;
 import com.jinnova.smartpad.db.PromotionDao;
 import com.jinnova.smartpad.partner.Catalog;
 import com.jinnova.smartpad.partner.CatalogItem;
+import com.jinnova.smartpad.partner.ICatalogSpec;
 import com.jinnova.smartpad.partner.IDetailManager;
 import com.jinnova.smartpad.partner.Operation;
 import com.jinnova.smartpad.partner.PartnerManager;
@@ -330,7 +331,15 @@ public class DetailManager implements IDetailManager {
 				dr.add(catItem);
 				dr.layoutOptions = LAYOPT_WITHBRANCH | LAYOPT_WITHSYSCAT | LAYOPT_WITHCAT | LAYOPT_WITHDETAILS;
 				
-				if (SYSTEM_BRANCH_ID.equals(catItem.getStoreId())) {
+				Catalog cat;
+				if (catItem.getBranchId().equals(catItem.getCatalogId())) {
+					cat = (Catalog) new OperationDao().loadBranch(catItem.getBranchId()).getRootCatalog();
+				} else {
+					cat = new CatalogDao().loadCatalog(catItem.getCatalogId(), false);
+				}
+				ICatalogSpec spec = cat.getSystemCatalog().getCatalogSpec();
+				//if (SYSTEM_BRANCH_ID.equals(catItem.getStoreId())) {
+				if (!spec.isManaged()) {
 					//dr.add(new ALCatalogsBelongToCatalog(catItem.getSyscatId(), null, RECURSIVE, 10, 8, 5));
 					Catalog syscat = (Catalog) PartnerManager.instance.getSystemCatalog(catItem.getSyscatId());
 					dr.add(TYPENAME_COMPOUND, 
