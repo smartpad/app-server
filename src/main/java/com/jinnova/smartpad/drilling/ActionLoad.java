@@ -87,6 +87,7 @@ abstract class ActionLoad {
 		actionClasses = new HashMap<String, Class<? extends ActionLoad>>();
 		register(new ALBranchesBelongToSyscat());
 		register(new ALCatalogsBelongToCatalog());
+		register(new ALItemBelongToBranch());
 		register(new ALItemBelongToCatalog());
 		register(new ALItemBelongToSyscat());
 		register(new ALPromotionsBelongToSyscat());
@@ -360,6 +361,27 @@ class ALCatalogsBelongToCatalog extends ActionLoad {
 	
 }
 
+class ALItemBelongToBranch extends ActionLoad {
+	
+	ALItemBelongToBranch() {
+		super(TYPENAME_BRANCH, TYPENAME_CATITEM, REL_BELONG);
+	}
+
+	ALItemBelongToBranch(String branchId, String syscatId, String excludeItemId, 
+			boolean recursive, int pageSize, int initialLoadSize, int initialDrillSize) {
+		this();
+		setParams(branchId, excludeItemId, recursive, pageSize, initialLoadSize, initialDrillSize);
+		super.syscatId = syscatId;
+	}
+
+	@Override
+	Object[] load(int offset, int size) throws SQLException {
+		String specId = PartnerManager.instance.getCatalogSpec(syscatId).getSpecId();
+		return new CatalogItemDao().iterateItems(anchorId, specId, excludeId, null, true, false, null, recursive, gpsLon, gpsLat, offset, size).toArray();
+	}
+	
+}
+
 class ALItemBelongToCatalog extends ActionLoad {
 	
 	ALItemBelongToCatalog() {
@@ -376,7 +398,7 @@ class ALItemBelongToCatalog extends ActionLoad {
 	@Override
 	Object[] load(int offset, int size) throws SQLException {
 		String specId = PartnerManager.instance.getCatalogSpec(syscatId).getSpecId();
-		return new CatalogItemDao().iterateItems(anchorId, specId, excludeId, null, false, null, recursive, gpsLon, gpsLat, offset, size).toArray();
+		return new CatalogItemDao().iterateItems(anchorId, specId, excludeId, null, false, false, null, recursive, gpsLon, gpsLat, offset, size).toArray();
 	}
 	
 }
@@ -396,7 +418,7 @@ class ALItemBelongToSyscat extends ActionLoad {
 	@Override
 	Object[] load(int offset, int size) throws SQLException {
 		String specId = PartnerManager.instance.getCatalogSpec(anchorId).getSpecId();
-		return new CatalogItemDao().iterateItems(anchorId, specId, null, buildSegmentMap(), true, clusterId, recursive, gpsLon, gpsLat, offset, size).toArray();
+		return new CatalogItemDao().iterateItems(anchorId, specId, null, buildSegmentMap(), false, true, clusterId, recursive, gpsLon, gpsLat, offset, size).toArray();
 	}
 	
 }

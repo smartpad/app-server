@@ -216,7 +216,13 @@ public class DetailManager implements IDetailManager {
 				dr.add(new ALCatalogsBelongToCatalog(branchId, null, DIRECT, 10, 10, 10).layopts(LAYOPT_NAMELINK | LAYOPT_PRIVATECAT));
 				
 				//catelog items from this branch's root category
-				dr.add(new ALItemBelongToCatalog(branchId, syscatId, null, RECURSIVE, 20, 20, 20).layopts(Feed.LAYOPT_WITHCAT));
+				ICatalogSpec spec = PartnerManager.instance.getCatalogSpec(syscatId);
+				if (spec.isManaged()) {
+					dr.add(new ALItemBelongToCatalog(branchId, syscatId, null, RECURSIVE, 20, 20, 20).layopts(Feed.LAYOPT_WITHCAT));
+				} else {
+					dr.add(new ALItemBelongToBranch(branchId, syscatId, null, RECURSIVE, 20, 20, 20).layopts(Feed.LAYOPT_WITHCAT));
+				}
+				
 				return dr;
 			}
 		};
